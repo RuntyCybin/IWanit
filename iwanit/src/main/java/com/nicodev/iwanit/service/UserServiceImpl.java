@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.nicodev.iwanit.exception.UserAlreadyExistException;
 import com.nicodev.iwanit.exception.UserInvalidCredentialsException;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
   private final JwtService jwtService;
 
   @Override
+  @Transactional
   public AuthResponseDto signUpUser(RegisterRequestDto registerRequestDto) {
     Objects.requireNonNull(registerRequestDto, "RegisterRequestDto must not be null");
     userRepository.findByUsername(registerRequestDto.username())

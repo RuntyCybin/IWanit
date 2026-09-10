@@ -19,8 +19,14 @@ import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 @RequestMapping("/v1/buyers")
 public class BuyerController {
 
+  /**
+   * Creates an article that a user wants to buy.
+   *
+   * @param buyerRequestDto the buyer request DTO
+   * @return the created buyer response DTO
+   */
   @PostMapping
-  public ResponseEntity<BuyerResponseDto> createBuyer(
+  public ResponseEntity<BuyerResponseDto> createABuy(
       @RequestBody BuyerRequestDto buyerRequestDto) {
     BuyerResponseDto buyerResponseDto = new BuyerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890");
     return ResponseEntity.ok(buyerResponseDto);
