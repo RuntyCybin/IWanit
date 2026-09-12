@@ -13,7 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.nicodev.iwanit.exception.UserAlreadyExistException;
 import com.nicodev.iwanit.exception.UserInvalidCredentialsException;
-import com.nicodev.iwanit.exception.UserNotFoundException;
+import com.nicodev.iwanit.exception.UserNotFoundByNameException;
+import com.nicodev.iwanit.exception.UserNotSavedException;
 import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.AuthRequestDto;
 import com.nicodev.iwanit.model.dto.AuthResponseDto;
@@ -47,7 +48,12 @@ public class UserServiceImpl implements UserService {
         registerRequestDto.username(),
         passwordEncoder.encode(registerRequestDto.password()),
         registerRequestDto.role());
-    userRepository.save(user);
+
+    try {
+      userRepository.save(user);
+    } catch (Exception e) {
+      throw new UserNotSavedException(registerRequestDto.username(), e.getMessage());
+    }
 
     String token = jwtService.generateToken(user);
     return new AuthResponseDto(token);
@@ -67,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     UserDetails userDetails = userRepository
         .findByUsername(authRequestDto.username())
-        .orElseThrow(() -> new UserNotFoundException(authRequestDto.username()));
+        .orElseThrow(() -> new UserNotFoundByNameException(authRequestDto.username()));
 
     String token = jwtService.generateToken(userDetails);
     return new AuthResponseDto(token);

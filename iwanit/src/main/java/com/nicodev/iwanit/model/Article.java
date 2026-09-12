@@ -31,10 +31,11 @@ public class Article {
   public Article() {
   }
 
-  public Article(String name, String description, Double price) {
+  public Article(String name, String description, Double price, Buyer buyer) {
     this.name = name;
     this.description = description;
     this.price = price;
+    this.buyer = buyer;
   }
 
   public String getName() {
