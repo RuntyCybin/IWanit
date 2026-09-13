@@ -153,4 +153,19 @@ public class GlobalExceptionHandler {
         .body(ex.getMessage());
   }
 
+  /**
+   * Handles ArticleNotDeletedException and returns a 500 Internal Server Error
+   * response.
+   * Exception is thrown when an article could not be deleted from the database.
+   * 
+   * @param ex
+   * @return
+   */
+  @ExceptionHandler(ArticleNotDeletedException.class)
+  public ResponseEntity<String> handleArticleNotDeletedException(ArticleNotDeletedException ex) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ex.getMessage());
+  }
+
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.ArticleAlreadyExistException;
 import com.nicodev.iwanit.exception.ArticleInvalidRequestException;
+import com.nicodev.iwanit.exception.ArticleNotDeletedException;
 import com.nicodev.iwanit.exception.ArticleNotSavedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.model.Article;
@@ -93,8 +94,7 @@ public class ArticleServiceImpl implements ArticleService {
     try {
       articleRepository.deleteById(id);
     } catch (Exception e) {
-      // TODO: create an exception class for failed article deletion and throw it here
-      throw new RuntimeException("Failed to delete article with ID: " + id, e);
+      throw new ArticleNotDeletedException(id, e);
     }
   }
 
