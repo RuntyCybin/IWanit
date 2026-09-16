@@ -19,4 +19,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
   // JOIN FETCH avoids N+1 when loading each article's buyer
   @Query("SELECT a FROM Article a JOIN FETCH a.buyer b WHERE b.id = :buyerId")
   List<Article> findAllByBuyerId(@Param("buyerId") Long buyerId);
+
+  // LEFT JOIN FETCH avoids N+1 when loading an article's offers (article may have
+  // none)
+  @Query("SELECT a FROM Article a LEFT JOIN FETCH a.offers WHERE a.id = :id")
+  Optional<Article> findByIdWithOffers(@Param("id") Long id);
 }

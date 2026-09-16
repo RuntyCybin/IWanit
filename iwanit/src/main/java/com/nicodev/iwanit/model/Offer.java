@@ -25,6 +25,10 @@ public class Offer {
   private Double price;
 
   @ManyToOne
+  @JoinColumn(name = "article_id", nullable = false)
+  private Article article;
+
+  @ManyToOne
   @JoinColumn(name = "seller_id", nullable = false)
   private Seller seller;
 
@@ -76,5 +80,13 @@ public class Offer {
 
   public void setSeller(Seller seller) {
     this.seller = seller;
+  }
+
+  public Article getArticle() {
+    return article;
+  }
+
+  public void setArticle(Article article) {
+    this.article = article;
   }
 }

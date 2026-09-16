@@ -1,6 +1,6 @@
 package com.nicodev.iwanit.controller;
 
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -14,35 +14,36 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nicodev.iwanit.model.dto.SellerRequestDto;
 import com.nicodev.iwanit.model.dto.SellerResponseDto;
+import com.nicodev.iwanit.service.SellerService;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/v1/sellers")
+@AllArgsConstructor
 public class SellerController {
+
+  private final SellerService sellerService;
 
   @PostMapping
   public ResponseEntity<SellerResponseDto> createSeller(@RequestBody SellerRequestDto sellerRequestDto) {
-    SellerResponseDto sellerResponseDto = new SellerResponseDto(1L, sellerRequestDto.name(), sellerRequestDto.email(),
-        sellerRequestDto.phoneNumber());
-    return ResponseEntity.ok(sellerResponseDto);
+    var createdSeller = this.sellerService.createSeller(sellerRequestDto);
+    return ResponseEntity.created(URI.create("/v1/sellers/" + createdSeller.id())).body(createdSeller);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<SellerResponseDto> getSeller(@PathVariable Long id) {
-    SellerResponseDto sellerResponseDto = new SellerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890");
-    return ResponseEntity.ok(sellerResponseDto);
+    return ResponseEntity.ok(this.sellerService.getSellerById(id));
   }
 
   @GetMapping
   public ResponseEntity<List<SellerResponseDto>> getAllSellers() {
-    List<SellerResponseDto> sellerResponseDtos = Arrays.asList(
-        new SellerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890"),
-        new SellerResponseDto(2L, "Jane Smith", "jane.smith@example.com", "098-765-4321"),
-        new SellerResponseDto(3L, "Bob Johnson", "bob.johnson@example.com", "555-555-5555"));
-    return ResponseEntity.ok(sellerResponseDtos);
+    return ResponseEntity.ok(this.sellerService.getAllSellers());
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<String> deleteSeller(@PathVariable Long id) {
-    return ResponseEntity.ok("Seller deleted successfully");
+  public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
+    this.sellerService.deleteSeller(id);
+    return ResponseEntity.noContent().build();
   }
 }

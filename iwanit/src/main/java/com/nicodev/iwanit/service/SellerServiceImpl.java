@@ -1,5 +1,6 @@
 package com.nicodev.iwanit.service;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
@@ -57,6 +58,17 @@ public class SellerServiceImpl implements SellerService {
             seller.getEmail(),
             seller.getPhoneNumber()))
         .orElseThrow(() -> new RuntimeException("Seller not found with ID: " + id));
+  }
+
+  @Override
+  public List<SellerResponseDto> getAllSellers() {
+    return sellerRepository.findAll().stream()
+        .map(seller -> new SellerResponseDto(
+            seller.getId(),
+            seller.getName(),
+            seller.getEmail(),
+            seller.getPhoneNumber()))
+        .toList();
   }
 
   @Override

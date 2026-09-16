@@ -12,6 +12,7 @@ import com.nicodev.iwanit.exception.UserNotFoundByEmailException;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
+import com.nicodev.iwanit.model.mapper.BuyerMapper;
 import com.nicodev.iwanit.repository.BuyerRepository;
 import com.nicodev.iwanit.repository.UserRepository;
 
@@ -24,6 +25,7 @@ public class BuyerServiceImpl implements BuyerService {
 
   private final UserRepository userRepository;
   private final BuyerRepository buyerRepository;
+  private final BuyerMapper buyerMapper;
 
   @Override
   @Transactional
@@ -34,33 +36,21 @@ public class BuyerServiceImpl implements BuyerService {
     var user = userRepository.findByEmail(buyerRequestDto.email())
         .orElseThrow(() -> new UserNotFoundByEmailException(buyerRequestDto.email()));
 
-    var buyer = new Buyer(
-        buyerRequestDto.name(),
-        buyerRequestDto.email(),
-        buyerRequestDto.phoneNumber(),
-        user);
+    var buyer = buyerMapper.mapBuyerRequestDtoToBuyer(buyerRequestDto, user);
 
     try {
       buyerRepository.save(buyer);
+      return buyerMapper.mapBuyerToResponseDto(buyer);
     } catch (Exception e) {
+      // TODO: Consider creating a custom exception for buyer creation failure
       throw new BuyerNotSavedException(buyerRequestDto.email(), e.getMessage());
     }
-
-    return new BuyerResponseDto(
-        buyer.getId(),
-        buyer.getName(),
-        buyer.getEmail(),
-        buyer.getPhoneNumber());
   }
 
   @Override
   public List<BuyerResponseDto> getAllBuyers() {
     return buyerRepository.findAll().stream()
-        .map(buyer -> new BuyerResponseDto(
-            buyer.getId(),
-            buyer.getName(),
-            buyer.getEmail(),
-            buyer.getPhoneNumber()))
+        .map(buyerMapper::mapBuyerToResponseDto)
         .toList();
   }
 
@@ -71,11 +61,7 @@ public class BuyerServiceImpl implements BuyerService {
     var buyer = buyerRepository.findById(id)
         .orElseThrow(() -> new BuyerNotFoundException(id, "Buyer not found"));
 
-    return new BuyerResponseDto(
-        buyer.getId(),
-        buyer.getName(),
-        buyer.getEmail(),
-        buyer.getPhoneNumber());
+    return buyerMapper.mapBuyerToResponseDto(buyer);
   }
 
   @Override
