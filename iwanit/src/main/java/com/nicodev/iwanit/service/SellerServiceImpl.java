@@ -5,9 +5,9 @@ import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
-import com.nicodev.iwanit.model.Seller;
 import com.nicodev.iwanit.model.dto.SellerRequestDto;
 import com.nicodev.iwanit.model.dto.SellerResponseDto;
+import com.nicodev.iwanit.model.mapper.SellerMapper;
 import com.nicodev.iwanit.repository.SellerRepository;
 import com.nicodev.iwanit.repository.UserRepository;
 
@@ -20,6 +20,7 @@ public class SellerServiceImpl implements SellerService {
 
   private final SellerRepository sellerRepository;
   private final UserRepository userRepository;
+  private final SellerMapper sellerMapper;
 
   @Override
   @Transactional
@@ -29,19 +30,11 @@ public class SellerServiceImpl implements SellerService {
     var user = userRepository.findByEmail(sellerRequestDto.email())
         .orElseThrow(() -> new RuntimeException("User not found with email: " + sellerRequestDto.email()));
 
-    var seller = new Seller(
-        sellerRequestDto.name(),
-        sellerRequestDto.email(),
-        sellerRequestDto.phoneNumber(),
-        user);
+    var seller = this.sellerMapper.mapSellerRequestToSeller(sellerRequestDto, user);
 
     try {
       var savedSeller = sellerRepository.save(seller);
-      return new SellerResponseDto(
-          savedSeller.getId(),
-          savedSeller.getName(),
-          savedSeller.getEmail(),
-          savedSeller.getPhoneNumber());
+      return this.sellerMapper.mapSellerToResponse(savedSeller);
     } catch (Exception e) {
       throw new RuntimeException("Failed to create seller", e);
     }
@@ -52,22 +45,14 @@ public class SellerServiceImpl implements SellerService {
     Objects.requireNonNull(id, "Seller ID must not be null");
 
     return sellerRepository.findById(id)
-        .map(seller -> new SellerResponseDto(
-            seller.getId(),
-            seller.getName(),
-            seller.getEmail(),
-            seller.getPhoneNumber()))
+        .map(this.sellerMapper::mapSellerToResponse)
         .orElseThrow(() -> new RuntimeException("Seller not found with ID: " + id));
   }
 
   @Override
   public List<SellerResponseDto> getAllSellers() {
     return sellerRepository.findAll().stream()
-        .map(seller -> new SellerResponseDto(
-            seller.getId(),
-            seller.getName(),
-            seller.getEmail(),
-            seller.getPhoneNumber()))
+        .map(this.sellerMapper::mapSellerToResponse)
         .toList();
   }
 

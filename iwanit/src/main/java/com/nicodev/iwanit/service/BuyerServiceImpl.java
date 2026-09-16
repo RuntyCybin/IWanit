@@ -9,7 +9,6 @@ import com.nicodev.iwanit.exception.BuyerNotDeletedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.exception.BuyerNotSavedException;
 import com.nicodev.iwanit.exception.UserNotFoundByEmailException;
-import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 import com.nicodev.iwanit.model.mapper.BuyerMapper;
