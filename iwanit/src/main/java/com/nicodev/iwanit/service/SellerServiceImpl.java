@@ -27,7 +27,7 @@ public class SellerServiceImpl implements SellerService {
   public SellerResponseDto createSeller(SellerRequestDto sellerRequestDto) {
     Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
 
-    var user = userRepository.findByEmail(sellerRequestDto.email())
+    var user = userRepository.findById(sellerRequestDto.userId())
         .orElseThrow(() -> new RuntimeException("User not found with email: " + sellerRequestDto.email()));
 
     var seller = this.sellerMapper.mapSellerRequestToSeller(sellerRequestDto, user);

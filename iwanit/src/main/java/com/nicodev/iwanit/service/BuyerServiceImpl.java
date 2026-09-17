@@ -32,7 +32,7 @@ public class BuyerServiceImpl implements BuyerService {
 
     Objects.requireNonNull(buyerRequestDto);
 
-    var user = userRepository.findByEmail(buyerRequestDto.email())
+    var user = userRepository.findById(buyerRequestDto.userId())
         .orElseThrow(() -> new UserNotFoundByEmailException(buyerRequestDto.email()));
 
     var buyer = buyerMapper.mapBuyerRequestDtoToBuyer(buyerRequestDto, user);

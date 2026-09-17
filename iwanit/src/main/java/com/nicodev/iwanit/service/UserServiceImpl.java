@@ -51,12 +51,11 @@ public class UserServiceImpl implements UserService {
 
     try {
       userRepository.save(user);
+      String token = jwtService.generateToken(user);
+      return new AuthResponseDto(token);
     } catch (Exception e) {
       throw new UserNotSavedException(registerRequestDto.username(), e.getMessage());
     }
-
-    String token = jwtService.generateToken(user);
-    return new AuthResponseDto(token);
   }
 
   @Override
