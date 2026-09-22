@@ -2,9 +2,6 @@ package com.nicodev.iwanit.service;
 
 import java.util.List;
 import java.util.Objects;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.BuyerNotDeletedException;
@@ -23,8 +20,6 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class BuyerServiceImpl implements BuyerService {
-
-  private final Logger logger = LoggerFactory.getLogger(BuyerServiceImpl.class);
 
   private final UserRepository userRepository;
   private final BuyerRepository buyerRepository;

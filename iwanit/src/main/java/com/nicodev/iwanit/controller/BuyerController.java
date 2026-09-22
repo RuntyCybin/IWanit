@@ -3,8 +3,6 @@ package com.nicodev.iwanit.controller;
 import java.net.URI;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +23,6 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BuyerController {
 
-  private final Logger log = LoggerFactory.getLogger(BuyerController.class);
   private final BuyerService buyerService;
 
   /**

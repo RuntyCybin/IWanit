@@ -16,7 +16,7 @@ public class ArticleMapper {
         article.getName(),
         article.getDescription(),
         article.getPrice(),
-        article.getBuyer());
+        article.getBuyer().getId());
   }
 
   public Article mapToArticle(ArticleRequestDto articleRequestDto, Buyer buyer) {
