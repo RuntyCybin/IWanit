@@ -1,5 +1,6 @@
 package com.nicodev.iwanit.service;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -14,11 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.nicodev.iwanit.exception.UserAlreadyExistException;
 import com.nicodev.iwanit.exception.UserInvalidCredentialsException;
 import com.nicodev.iwanit.exception.UserNotFoundByNameException;
+import com.nicodev.iwanit.exception.UserNotFoundException;
 import com.nicodev.iwanit.exception.UserNotSavedException;
 import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.AuthRequestDto;
 import com.nicodev.iwanit.model.dto.AuthResponseDto;
 import com.nicodev.iwanit.model.dto.RegisterRequestDto;
+import com.nicodev.iwanit.model.dto.UserResponseDto;
+import com.nicodev.iwanit.model.mapper.UserMapper;
 import com.nicodev.iwanit.repository.UserRepository;
 import com.nicodev.iwanit.security.JwtService;
 
@@ -34,7 +38,14 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
+  private final UserMapper userMapper;
 
+  /**
+   * (non-Javadoc)
+   * Register a new User setting up a Role
+   * 
+   * @see UserService#signUpUser(RegisterRequestDto)
+   */
   @Override
   @Transactional
   public AuthResponseDto signUpUser(RegisterRequestDto registerRequestDto) {
@@ -58,6 +69,12 @@ public class UserServiceImpl implements UserService {
     }
   }
 
+  /**
+   * (non-Javadoc)
+   * Login of a User
+   * 
+   * @see UserService#signInUser(AuthRequestDto)
+   */
   @Override
   public AuthResponseDto signInUser(AuthRequestDto authRequestDto) {
     Objects.requireNonNull(authRequestDto, "AuthRequestDto must not be null");
@@ -76,6 +93,33 @@ public class UserServiceImpl implements UserService {
 
     String token = jwtService.generateToken(userDetails);
     return new AuthResponseDto(token);
+  }
+
+  @Override
+  public UserResponseDto getUsersById(Long id) {
+    Objects.requireNonNull(id, "User id is required");
+
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new UserNotFoundException(id.toString()));
+
+    return this.userMapper.mapUserToUserResponseDto(user);
+  }
+
+  @Override
+  public List<UserResponseDto> getAllUsers() {
+    return this.userRepository.findAll().stream()
+        .map(userMapper::mapUserToUserResponseDto)
+        .toList();
+  }
+
+  @Override
+  public UserResponseDto getUserByName(String username) {
+    Objects.requireNonNull(username, "Username can not be null");
+
+    User user = this.userRepository.findByUsername(username)
+        .orElseThrow(() -> new UserNotFoundByNameException(username));
+
+    return this.userMapper.mapUserToUserResponseDto(user);
   }
 
 }
