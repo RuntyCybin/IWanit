@@ -2,6 +2,7 @@ package com.nicodev.iwanit.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -29,8 +30,8 @@ public class GlobalExceptionHandler {
    * @param ex
    * @return
    */
-  @ExceptionHandler(UserNotFoundByEmailException.class)
-  public ResponseEntity<String> handleUserNotFoundByEmailException(UserNotFoundByEmailException ex) {
+  @ExceptionHandler(UserNotFoundException.class)
+  public ResponseEntity<String> handleUserNotFoundByEmailException(UserNotFoundException ex) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(ex.getMessage());
@@ -163,6 +164,13 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(ArticleNotDeletedException.class)
   public ResponseEntity<String> handleArticleNotDeletedException(ArticleNotDeletedException ex) {
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ex.getMessage());
+  }
+
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public ResponseEntity<String> handleMessageNotReadaEntityException(HttpMessageNotReadableException ex) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ex.getMessage());
