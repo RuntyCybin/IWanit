@@ -3,6 +3,8 @@ package com.nicodev.iwanit.controller;
 import java.net.URI;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,19 +25,22 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BuyerController {
 
+  private final Logger log = LoggerFactory.getLogger(BuyerController.class);
   private final BuyerService buyerService;
 
   /**
-   * Creates an article that a user wants to buy.
+   * Creates a buyer related to a user
    *
    * @param buyerRequestDto the buyer request DTO
    * @return the created buyer response DTO
    */
   @PostMapping
-  public ResponseEntity<BuyerResponseDto> createABuy(
+  public ResponseEntity<BuyerResponseDto> createBuyer(
       @RequestBody BuyerRequestDto buyerRequestDto) {
     BuyerResponseDto createdBuyer = this.buyerService.createBuyer(buyerRequestDto);
-    return ResponseEntity.created(URI.create("/v1/buyers/" + createdBuyer.id())).body(createdBuyer);
+    return ResponseEntity
+        .created(URI.create("/v1/buyers/" + createdBuyer.id()))
+        .body(createdBuyer);
   }
 
   /**
