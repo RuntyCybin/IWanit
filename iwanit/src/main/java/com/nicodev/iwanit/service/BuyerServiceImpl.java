@@ -3,12 +3,14 @@ package com.nicodev.iwanit.service;
 import java.util.List;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.BuyerNotDeletedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.exception.BuyerNotSavedException;
-import com.nicodev.iwanit.exception.UserNotFoundByEmailException;
+import com.nicodev.iwanit.exception.UserNotFoundException;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 import com.nicodev.iwanit.model.mapper.BuyerMapper;
@@ -22,6 +24,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class BuyerServiceImpl implements BuyerService {
 
+  private final Logger logger = LoggerFactory.getLogger(BuyerServiceImpl.class);
+
   private final UserRepository userRepository;
   private final BuyerRepository buyerRepository;
   private final BuyerMapper buyerMapper;
@@ -33,12 +37,13 @@ public class BuyerServiceImpl implements BuyerService {
     Objects.requireNonNull(buyerRequestDto);
 
     var user = userRepository.findById(buyerRequestDto.userId())
-        .orElseThrow(() -> new UserNotFoundByEmailException(buyerRequestDto.email()));
+        .orElseThrow(() -> new UserNotFoundException(buyerRequestDto.email()));
 
     var buyer = buyerMapper.mapBuyerRequestDtoToBuyer(buyerRequestDto, user);
 
     try {
       buyerRepository.save(buyer);
+
       return buyerMapper.mapBuyerToResponseDto(buyer);
     } catch (Exception e) {
       // TODO: Consider creating a custom exception for buyer creation failure

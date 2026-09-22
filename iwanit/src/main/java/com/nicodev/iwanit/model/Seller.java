@@ -34,6 +34,10 @@ public class Seller {
   @OneToMany(mappedBy = "seller")
   private List<Offer> offers;
 
+  public Seller() {
+
+  }
+
   public Seller(String name, String email, String phoneNumber) {
     this.name = name;
     this.email = email;
