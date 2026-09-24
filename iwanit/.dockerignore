@@ -9,6 +9,5 @@ target/
 HELP.md
 .mvn/wrapper/maven-wrapper.jar
 Dockerfile
-docker-compose.yml
 .dockerignore
 .env
