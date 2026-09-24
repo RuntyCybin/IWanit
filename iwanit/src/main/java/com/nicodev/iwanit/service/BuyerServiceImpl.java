@@ -41,7 +41,6 @@ public class BuyerServiceImpl implements BuyerService {
 
       return buyerMapper.mapBuyerToResponseDto(buyer);
     } catch (Exception e) {
-      // TODO: Consider creating a custom exception for buyer creation failure
       throw new BuyerNotSavedException(buyerRequestDto.email(), e.getMessage());
     }
   }

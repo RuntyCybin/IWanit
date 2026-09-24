@@ -29,7 +29,9 @@ public class ArticleController {
   @PostMapping
   public ResponseEntity<ArticleResponseDto> create(@RequestBody ArticleRequestDto articleRequestDto) {
     var cfreatedArticle = this.articleService.createArticle(articleRequestDto);
-    return ResponseEntity.created(URI.create("/v1/articles/" + cfreatedArticle.id())).body(cfreatedArticle);
+    return ResponseEntity
+        .created(URI.create("/v1/articles/" + cfreatedArticle.id()))
+        .body(cfreatedArticle);
   }
 
   @GetMapping("/{id}")
