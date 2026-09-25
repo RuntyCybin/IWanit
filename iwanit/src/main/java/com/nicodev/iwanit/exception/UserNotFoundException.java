@@ -1,7 +1,7 @@
 package com.nicodev.iwanit.exception;
 
 public class UserNotFoundException extends RuntimeException {
-  public UserNotFoundException(String username) {
-    super("User not found: " + username);
+  public UserNotFoundException(String msg) {
+    super("User not found with id: " + msg);
   }
 }

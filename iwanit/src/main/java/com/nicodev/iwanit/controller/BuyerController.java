@@ -1,6 +1,6 @@
 package com.nicodev.iwanit.controller;
 
-import java.util.Arrays;
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -14,36 +14,62 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
+import com.nicodev.iwanit.service.BuyerService;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/v1/buyers")
+@AllArgsConstructor
 public class BuyerController {
 
+  private final BuyerService buyerService;
+
+  /**
+   * Creates a buyer related to a user
+   *
+   * @param buyerRequestDto the buyer request DTO
+   * @return the created buyer response DTO
+   */
   @PostMapping
   public ResponseEntity<BuyerResponseDto> createBuyer(
       @RequestBody BuyerRequestDto buyerRequestDto) {
-    BuyerResponseDto buyerResponseDto = new BuyerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890");
-    return ResponseEntity.ok(buyerResponseDto);
+    BuyerResponseDto createdBuyer = this.buyerService.createBuyer(buyerRequestDto);
+    return ResponseEntity
+        .created(URI.create("/v1/buyers/" + createdBuyer.id()))
+        .body(createdBuyer);
   }
 
+  /**
+   * Gets a buyer by its ID
+   * 
+   * @param id
+   * @return
+   */
   @GetMapping("/{id}")
   public ResponseEntity<BuyerResponseDto> getBuyer(@PathVariable Long id) {
-    BuyerResponseDto buyerResponseDto = new BuyerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890");
-    return ResponseEntity.ok(buyerResponseDto);
+    return ResponseEntity.ok(this.buyerService.getBuyerById(id));
   }
 
+  /**
+   * Gets all the buyers
+   * 
+   * @return
+   */
   @GetMapping
   public ResponseEntity<List<BuyerResponseDto>> getAllBuyers() {
-    List<BuyerResponseDto> buyerResponseDtos = Arrays.asList(
-        new BuyerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890"),
-        new BuyerResponseDto(2L, "Jane Smith", "jane.smith@example.com", "098-765-4321"),
-        new BuyerResponseDto(3L, "Bob Johnson", "bob.johnson@example.com", "555-555-5555"));
-    return ResponseEntity.ok(buyerResponseDtos);
+    return ResponseEntity.ok(this.buyerService.getAllBuyers());
   }
 
+  /**
+   * Deletes a buyer
+   * 
+   * @param id
+   * @return
+   */
   @DeleteMapping("/{id}")
-  public ResponseEntity<BuyerResponseDto> deleteBuyer(@PathVariable Long id) {
-    BuyerResponseDto buyerResponseDto = new BuyerResponseDto(1L, "John Doe", "john.doe@example.com", "123-456-7890");
-    return ResponseEntity.ok(buyerResponseDto);
+  public ResponseEntity<Void> deleteBuyer(@PathVariable Long id) {
+    this.buyerService.deleteBuyer(id);
+    return ResponseEntity.noContent().build();
   }
 }
