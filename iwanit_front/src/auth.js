@@ -2,15 +2,23 @@ import { ref } from 'vue'
 import router from './router'
 
 export const token = ref(localStorage.getItem('token'))
+export const role = ref(localStorage.getItem('role'))
 
 export function setToken(value) {
   token.value = value
   localStorage.setItem('token', value)
 }
 
+export function setRole(value) {
+  role.value = value
+  localStorage.setItem('role', value)
+}
+
 export function logout() {
   token.value = null
+  role.value = null
   localStorage.removeItem('token')
+  localStorage.removeItem('role')
   router.push({ name: 'login' })
 }
 
@@ -20,6 +28,7 @@ export function logout() {
 window.addEventListener('storage', (event) => {
   if (event.key === 'token' && !event.newValue) {
     token.value = null
+    role.value = null
     router.push({ name: 'login' })
   }
 })

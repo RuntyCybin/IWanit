@@ -1,5 +1,5 @@
 <script setup>
-import { logout } from '../auth'
+import { logout, role } from '../auth'
 
 const links = [
   { name: 'home', label: 'Articulos' },
@@ -24,6 +24,13 @@ const links = [
         >
           {{ link.label }}
         </router-link>
+
+        <span
+          v-if="role"
+          class="ml-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+        >
+          {{ role }}
+        </span>
       </div>
 
       <button

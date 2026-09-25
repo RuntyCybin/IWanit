@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +62,7 @@ public class UserServiceImpl implements UserService {
     try {
       userRepository.save(user);
       String token = jwtService.generateToken(user);
-      return new AuthResponseDto(token);
+      return new AuthResponseDto(token, registerRequestDto.role());
     } catch (Exception e) {
       throw new UserNotSavedException(registerRequestDto.username(), e.getMessage());
     }
@@ -87,12 +86,12 @@ public class UserServiceImpl implements UserService {
       throw new UserInvalidCredentialsException(authRequestDto.username());
     }
 
-    UserDetails userDetails = userRepository
+    User user = userRepository
         .findByUsername(authRequestDto.username())
         .orElseThrow(() -> new UserNotFoundByNameException(authRequestDto.username()));
 
-    String token = jwtService.generateToken(userDetails);
-    return new AuthResponseDto(token);
+    String token = jwtService.generateToken(user);
+    return new AuthResponseDto(token, user.getRole());
   }
 
   @Override

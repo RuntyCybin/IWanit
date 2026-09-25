@@ -1,5 +1,7 @@
 package com.nicodev.iwanit.model.dto;
 
-public record AuthResponseDto(String token) {
+import com.nicodev.iwanit.model.Role;
+
+public record AuthResponseDto(String token, Role role) {
 
 }
