@@ -32,7 +32,7 @@ const links = [
           {{ role }}
         </span>
 
-        <span class="group relative ml-2 shrink-0">
+        <router-link :to="{ name: 'profile' }" class="group relative ml-2 shrink-0">
           <span
             class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full
                    bg-slate-100 border border-slate-200"
@@ -69,7 +69,7 @@ const links = [
               Necesita completar el perfil
             </span>
           </template>
-        </span>
+        </router-link>
       </div>
 
       <button

@@ -3,6 +3,7 @@ import Login from '../views/Login.vue'
 import Home from '../views/Home.vue'
 import AboutUs from '../views/AboutUs.vue'
 import Contact from '../views/Contact.vue'
+import Profile from '../views/Profile.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -11,6 +12,7 @@ const router = createRouter({
     { path: '/', name: 'home', component: Home },
     { path: '/about', name: 'about', component: AboutUs },
     { path: '/contact', name: 'contact', component: Contact },
+    { path: '/profile', name: 'profile', component: Profile },
   ],
 })
 
