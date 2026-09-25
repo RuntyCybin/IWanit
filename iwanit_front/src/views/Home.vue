@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { logout } from '../auth'
+import NavBar from '../components/NavBar.vue'
 
 // Datos mockeados con la misma forma que ArticleResponseDto (title, content,
 // price). Se reemplazara por una llamada real a GET /v1/articles cuando el
@@ -50,34 +50,28 @@ function formatPrice(price) {
 </script>
 
 <template>
-  <main class="min-h-screen bg-slate-100 p-4">
-    <div class="max-w-5xl mx-auto">
-      <header class="mb-6 flex items-start justify-between gap-4">
-        <div>
+  <div class="min-h-screen bg-slate-100">
+    <NavBar />
+
+    <main class="p-4">
+      <div class="max-w-5xl mx-auto">
+        <header class="mb-6">
           <h1 class="text-2xl font-semibold text-slate-900">Articulos</h1>
           <p class="mt-1 text-sm text-slate-500">Listado de articulos disponibles.</p>
-        </div>
-        <button
-          type="button"
-          class="shrink-0 rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-600
-                 border border-slate-200 transition hover:bg-slate-50"
-          @click="logout"
-        >
-          Cerrar sesion
-        </button>
-      </header>
+        </header>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <article
-          v-for="article in articles"
-          :key="article.id"
-          class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col"
-        >
-          <h2 class="text-base font-medium text-slate-900">{{ article.title }}</h2>
-          <p class="mt-2 text-sm text-slate-500 flex-1">{{ article.content }}</p>
-          <p class="mt-3 text-lg font-semibold text-slate-900">{{ formatPrice(article.price) }}</p>
-        </article>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <article
+            v-for="article in articles"
+            :key="article.id"
+            class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col"
+          >
+            <h2 class="text-base font-medium text-slate-900">{{ article.title }}</h2>
+            <p class="mt-2 text-sm text-slate-500 flex-1">{{ article.content }}</p>
+            <p class="mt-3 text-lg font-semibold text-slate-900">{{ formatPrice(article.price) }}</p>
+          </article>
+        </div>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </template>
