@@ -3,6 +3,8 @@ import router from './router'
 
 export const token = ref(localStorage.getItem('token'))
 export const role = ref(localStorage.getItem('role'))
+export const avatarUrl = ref(localStorage.getItem('avatarUrl'))
+export const email = ref(localStorage.getItem('email'))
 
 export function setToken(value) {
   token.value = value
@@ -14,11 +16,25 @@ export function setRole(value) {
   localStorage.setItem('role', value)
 }
 
+export function setAvatarUrl(value) {
+  avatarUrl.value = value
+  localStorage.setItem('avatarUrl', value)
+}
+
+export function setEmail(value) {
+  email.value = value
+  localStorage.setItem('email', value)
+}
+
 export function logout() {
   token.value = null
   role.value = null
+  avatarUrl.value = null
+  email.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('role')
+  localStorage.removeItem('avatarUrl')
+  localStorage.removeItem('email')
   router.push({ name: 'login' })
 }
 
@@ -29,6 +45,8 @@ window.addEventListener('storage', (event) => {
   if (event.key === 'token' && !event.newValue) {
     token.value = null
     role.value = null
+    avatarUrl.value = null
+    email.value = null
     router.push({ name: 'login' })
   }
 })
