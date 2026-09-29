@@ -45,7 +45,9 @@ public class SellerController {
   @PostMapping
   public ResponseEntity<SellerResponseDto> createSeller(@RequestBody SellerRequestDto sellerRequestDto) {
     var createdSeller = this.sellerService.createSeller(sellerRequestDto);
-    return ResponseEntity.created(URI.create("/v1/sellers/" + createdSeller.id())).body(createdSeller);
+    return ResponseEntity
+        .created(URI.create("/v1/sellers/" + createdSeller.id()))
+        .body(createdSeller);
   }
 
   /**

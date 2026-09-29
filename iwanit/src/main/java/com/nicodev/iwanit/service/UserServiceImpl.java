@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     try {
       userRepository.save(user);
       String token = jwtService.generateToken(user);
-      return new AuthResponseDto(token, registerRequestDto.role());
+      return new AuthResponseDto(token, registerRequestDto.role(), user.getId());
     } catch (Exception e) {
       throw new UserNotSavedException(registerRequestDto.username(), e.getMessage());
     }
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new UserNotFoundByNameException(authRequestDto.username()));
 
     String token = jwtService.generateToken(user);
-    return new AuthResponseDto(token, user.getRole());
+    return new AuthResponseDto(token, user.getRole(), user.getId());
   }
 
   @Override

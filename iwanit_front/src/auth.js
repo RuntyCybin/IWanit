@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import router from './router'
 
 export const token = ref(localStorage.getItem('token'))
+export const userId = ref(localStorage.getItem('userId'))
 export const role = ref(localStorage.getItem('role'))
 export const avatarUrl = ref(localStorage.getItem('avatarUrl'))
 export const email = ref(localStorage.getItem('email'))
@@ -11,6 +12,11 @@ export const phoneNumber = ref(localStorage.getItem('phoneNumber'))
 export function setToken(value) {
   token.value = value
   localStorage.setItem('token', value)
+}
+
+export function setUserId(value) {
+  userId.value = value
+  localStorage.setItem('userId', value)
 }
 
 export function setRole(value) {
@@ -40,12 +46,14 @@ export function setPhoneNumber(value) {
 
 export function logout() {
   token.value = null
+  userId.value = null
   role.value = null
   avatarUrl.value = null
   email.value = null
   name.value = null
   phoneNumber.value = null
   localStorage.removeItem('token')
+  localStorage.removeItem('userId')
   localStorage.removeItem('role')
   localStorage.removeItem('avatarUrl')
   localStorage.removeItem('email')
@@ -60,6 +68,7 @@ export function logout() {
 window.addEventListener('storage', (event) => {
   if (event.key === 'token' && !event.newValue) {
     token.value = null
+    userId.value = null
     role.value = null
     avatarUrl.value = null
     email.value = null
