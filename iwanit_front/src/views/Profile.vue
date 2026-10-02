@@ -22,6 +22,11 @@ const saved = ref(false)
 const error = ref('')
 const loading = ref(false)
 
+// Si ya habia algun dato guardado (completo o parcial) antes de abrir el
+// formulario, el buyer/seller ya existe en el backend y hay que actualizarlo
+// (PUT) en vez de crearlo (POST).
+const hasExistingData = !!(savedName.value || savedEmail.value || savedPhoneNumber.value)
+
 // userId y role no se editan en este formulario: vienen del login/registro y solo
 // se usan para identificar de quien son los datos al guardar el perfil.
 async function submit() {
@@ -46,7 +51,7 @@ async function submit() {
 
   try {
     const res = await fetch(API + path, {
-      method: 'POST',
+      method: hasExistingData ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token.value}`,

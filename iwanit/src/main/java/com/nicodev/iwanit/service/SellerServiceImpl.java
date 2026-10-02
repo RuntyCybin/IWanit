@@ -75,4 +75,33 @@ public class SellerServiceImpl implements SellerService {
 
   }
 
+  @Override
+  public SellerResponseDto getSellerByUserId(Long userId) {
+    Objects.requireNonNull(userId, "User ID must not be null");
+
+    return sellerRepository.findByUserId(userId)
+        .map(this.sellerMapper::mapSellerToResponse)
+        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + userId));
+  }
+
+  @Override
+  @Transactional
+  public SellerResponseDto updateSeller(SellerRequestDto sellerRequestDto) {
+    Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
+
+    var updatedSeller = sellerRepository.findByUserId(sellerRequestDto.userId())
+        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + sellerRequestDto.userId()));
+
+    updatedSeller.setName(sellerRequestDto.name());
+    updatedSeller.setEmail(sellerRequestDto.email());
+    updatedSeller.setPhoneNumber(sellerRequestDto.phoneNumber());
+
+    try {
+      var savedSeller = sellerRepository.save(updatedSeller);
+      return this.sellerMapper.mapSellerToResponse(savedSeller);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to update seller for user ID: " + sellerRequestDto.userId(), e);
+    }
+  }
+
 }

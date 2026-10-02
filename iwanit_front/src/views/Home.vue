@@ -1,6 +1,40 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
+import { userId, role, token, setEmail, setName, setPhoneNumber } from '../auth'
+
+const API = '/api'
+
+// Al entrar a Home traemos los datos del buyer/seller asociados al userId
+// logueado y los guardamos en localStorage, para que el resto de la app
+// (navbar, perfil) los tenga disponibles sin pedirlos de nuevo.
+onMounted(async () => {
+  if (!userId.value || !role.value) return
+
+  const path =
+    role.value === 'BUYER'
+      ? `/v1/buyers/user/${userId.value}`
+      : role.value === 'SELLER'
+        ? `/v1/sellers/user/${userId.value}`
+        : null
+
+  if (!path) return
+
+  try {
+    const res = await fetch(API + path, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) return
+
+    const data = await res.json()
+    setEmail(data.email)
+    setName(data.name)
+    setPhoneNumber(data.phoneNumber)
+  } catch (e) {
+    // sin conexion a la API: se mantienen los datos ya guardados en localStorage
+  }
+})
 
 // Datos mockeados con la misma forma que ArticleResponseDto (title, content,
 // price). Se reemplazara por una llamada real a GET /v1/articles cuando el

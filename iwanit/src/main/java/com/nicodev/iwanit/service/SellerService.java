@@ -14,4 +14,8 @@ public interface SellerService {
   List<SellerResponseDto> getAllSellers();
 
   void deleteSeller(Long id);
+
+  SellerResponseDto getSellerByUserId(Long userId);
+
+  SellerResponseDto updateSeller(SellerRequestDto sellerRequestDto);
 }
