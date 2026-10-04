@@ -14,4 +14,8 @@ public interface BuyerService {
   BuyerResponseDto getBuyerById(Long id);
 
   void deleteBuyer(Long id);
+
+  BuyerResponseDto getBuyerByUserId(Long userId);
+
+  BuyerResponseDto updateBuyer(BuyerRequestDto buyerRequestDto);
 }

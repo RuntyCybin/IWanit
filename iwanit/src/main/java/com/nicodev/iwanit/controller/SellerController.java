@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +46,9 @@ public class SellerController {
   @PostMapping
   public ResponseEntity<SellerResponseDto> createSeller(@RequestBody SellerRequestDto sellerRequestDto) {
     var createdSeller = this.sellerService.createSeller(sellerRequestDto);
-    return ResponseEntity.created(URI.create("/v1/sellers/" + createdSeller.id())).body(createdSeller);
+    return ResponseEntity
+        .created(URI.create("/v1/sellers/" + createdSeller.id()))
+        .body(createdSeller);
   }
 
   /**
@@ -79,5 +82,22 @@ public class SellerController {
   public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
     this.sellerService.deleteSeller(id);
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Get a seller by user ID
+   */
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<SellerResponseDto> getSellerByUserId(@PathVariable Long userId) {
+    return ResponseEntity.ok(this.sellerService.getSellerByUserId(userId));
+  }
+
+  /**
+   * Update a seller
+   */
+  @PutMapping
+  public ResponseEntity<SellerResponseDto> updateSeller(@RequestBody SellerRequestDto sellerRequestDto) {
+    SellerResponseDto updatedSeller = this.sellerService.updateSeller(sellerRequestDto);
+    return ResponseEntity.ok(updatedSeller);
   }
 }

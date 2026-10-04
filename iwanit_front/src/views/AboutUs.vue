@@ -17,7 +17,7 @@ import NavBar from '../components/NavBar.vue'
           <section>
             <h2 class="text-base font-medium text-slate-900">Nuestra mision</h2>
             <p class="mt-2 text-sm text-slate-600 leading-relaxed">
-              IWanit nace para que comprar y vender articulos de segunda mano sea simple, rapido
+              IWanit nace para que comprar y vender articulos nuevos o de segunda mano sea simple, rapido
               y confiable. Conectamos a compradores y vendedores en un mismo lugar, sin
               intermediarios innecesarios, para darle una segunda vida a las cosas que ya no usas.
             </p>
@@ -26,8 +26,8 @@ import NavBar from '../components/NavBar.vue'
           <section>
             <h2 class="text-base font-medium text-slate-900">Como funciona</h2>
             <p class="mt-2 text-sm text-slate-600 leading-relaxed">
-              Los vendedores publican sus articulos con una descripcion y un precio, y los
-              compradores pueden explorar el catalogo y hacer ofertas por lo que les interesa.
+              Los compradores publican los articulos que quieren adquirir con una descripcion y un precio, y los
+              vendedores publican ofertas que solo los compradores pueden ver en su seccion Home.
               Todo el proceso queda centralizado en la plataforma, para que ambas partes tengan
               claridad sobre el estado de cada operacion.
             </p>

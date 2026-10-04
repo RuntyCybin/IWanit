@@ -1,48 +1,62 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
+import { userId, role, token, setEmail, setName, setPhoneNumber, setBuyerId } from '../auth'
 
-// Datos mockeados con la misma forma que ArticleResponseDto (title, content,
-// price). Se reemplazara por una llamada real a GET /v1/articles cuando el
-// endpoint exista.
-const articles = ref([
-  {
-    id: 1,
-    title: 'Bicicleta de montana Trek',
-    content: 'Rodado 29, frenos a disco, poco uso, ideal para principiantes.',
-    price: 350000,
-  },
-  {
-    id: 2,
-    title: 'Notebook Lenovo IdeaPad 3',
-    content: 'Intel i5, 8GB RAM, 256GB SSD. Con cargador original.',
-    price: 420000,
-  },
-  {
-    id: 3,
-    title: 'Guitarra electrica Squier',
-    content: 'Serie Stratocaster, color sunburst, incluye funda blanda.',
-    price: 180000,
-  },
-  {
-    id: 4,
-    title: 'Mesa de living de madera',
-    content: 'Mesa ratona 100x50cm, madera de pino maciza, muy buen estado.',
-    price: 90000,
-  },
-  {
-    id: 5,
-    title: 'Consola PlayStation 5',
-    content: 'Version estandar con un control adicional y tres juegos.',
-    price: 650000,
-  },
-  {
-    id: 6,
-    title: 'Cafetera Nespresso',
-    content: 'Modelo Essenza Mini, funciona perfecto, incluye base para capsulas.',
-    price: 60000,
-  },
-])
+const API = '/api'
+
+const articles = ref([])
+
+async function fetchArticles(id) {
+  try {
+    const res = await fetch(`${API}/v1/articles/buyer/${id}`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) return
+
+    articles.value = await res.json()
+  } catch (e) {
+    // sin conexion a la API: se mantiene la lista vacia
+  }
+}
+
+// Al entrar a Home traemos los datos del buyer/seller asociados al userId
+// logueado y los guardamos en localStorage, para que el resto de la app
+// (navbar, perfil) los tenga disponibles sin pedirlos de nuevo. Si es un
+// buyer, con su buyerId pedimos ademas sus articulos.
+onMounted(async () => {
+  if (!userId.value || !role.value) return
+
+  const path =
+    role.value === 'BUYER'
+      ? `/v1/buyers/user/${userId.value}`
+      : role.value === 'SELLER'
+        ? `/v1/sellers/user/${userId.value}`
+        : null
+
+  if (!path) return
+
+  try {
+    const res = await fetch(API + path, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) return
+
+    const data = await res.json()
+    setEmail(data.email)
+    setName(data.name)
+    setPhoneNumber(data.phoneNumber)
+
+    if (role.value === 'BUYER') {
+      setBuyerId(data.id)
+      await fetchArticles(data.id)
+    }
+  } catch (e) {
+    // sin conexion a la API: se mantienen los datos ya guardados en localStorage
+  }
+})
 
 function formatPrice(price) {
   return price.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 })
@@ -55,12 +69,26 @@ function formatPrice(price) {
 
     <main class="p-4">
       <div class="max-w-5xl mx-auto">
-        <header class="mb-6">
-          <h1 class="text-2xl font-semibold text-slate-900">Articulos</h1>
-          <p class="mt-1 text-sm text-slate-500">Listado de articulos disponibles.</p>
+        <header class="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold text-slate-900">Articulos</h1>
+            <p class="mt-1 text-sm text-slate-500">Listado de articulos deseables.</p>
+          </div>
+
+          <router-link
+            :to="{ name: 'create-article' }"
+            class="shrink-0 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white
+                   transition hover:bg-slate-800"
+          >
+            Crear
+          </router-link>
         </header>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p v-if="articles.length === 0" class="text-sm text-slate-500">
+          No hay articulos para mostrar.
+        </p>
+
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <article
             v-for="article in articles"
             :key="article.id"

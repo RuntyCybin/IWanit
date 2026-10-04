@@ -76,4 +76,34 @@ public class BuyerServiceImpl implements BuyerService {
       throw new BuyerNotDeletedException(id, e.getMessage());
     }
   }
+
+  @Override
+  public BuyerResponseDto getBuyerByUserId(Long userId) {
+    Objects.requireNonNull(userId, "User ID must not be null");
+
+    var buyer = buyerRepository.findByUserId(userId)
+        .orElseThrow(() -> new BuyerNotFoundException(userId, "Buyer not found for user ID"));
+
+    return buyerMapper.mapBuyerToResponseDto(buyer);
+  }
+
+  @Override
+  @Transactional
+  public BuyerResponseDto updateBuyer(BuyerRequestDto buyerRequestDto) {
+    Objects.requireNonNull(buyerRequestDto, "BuyerRequestDto must not be null");
+
+    var updatedBuyer = buyerRepository.findByUserId(buyerRequestDto.userId())
+        .orElseThrow(() -> new BuyerNotFoundException(buyerRequestDto.userId(), "Buyer not found for user ID"));
+
+    updatedBuyer.setName(buyerRequestDto.name());
+    updatedBuyer.setEmail(buyerRequestDto.email());
+    updatedBuyer.setPhoneNumber(buyerRequestDto.phoneNumber());
+
+    try {
+      buyerRepository.save(updatedBuyer);
+      return buyerMapper.mapBuyerToResponseDto(updatedBuyer);
+    } catch (Exception e) {
+      throw new BuyerNotSavedException(buyerRequestDto.email(), e.getMessage());
+    }
+  }
 }
