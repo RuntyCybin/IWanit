@@ -4,14 +4,17 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.SellerRequestDto;
 import com.nicodev.iwanit.model.dto.SellerResponseDto;
 import com.nicodev.iwanit.service.SellerService;
@@ -35,17 +38,21 @@ public class SellerController {
   private final SellerService sellerService;
 
   /**
-   * Creates a seller related to an existing user.
+   * Creates a seller related to the authenticated user.
    *
-   * @param sellerRequestDto the seller data to persist, including the ID of the
-   *                         user the seller belongs to
+   * @param user             the authenticated user the seller belongs to
+   * @param sellerRequestDto the seller data to persist
    * @return {@code 201 Created} with the persisted seller and a {@code Location}
    *         header pointing to the new resource
    */
   @PostMapping
-  public ResponseEntity<SellerResponseDto> createSeller(@RequestBody SellerRequestDto sellerRequestDto) {
-    var createdSeller = this.sellerService.createSeller(sellerRequestDto);
-    return ResponseEntity.created(URI.create("/v1/sellers/" + createdSeller.id())).body(createdSeller);
+  public ResponseEntity<SellerResponseDto> createSeller(
+      @AuthenticationPrincipal User user,
+      @RequestBody SellerRequestDto sellerRequestDto) {
+    var createdSeller = this.sellerService.createSeller(user.getId(), sellerRequestDto);
+    return ResponseEntity
+        .created(URI.create("/v1/sellers/" + createdSeller.id()))
+        .body(createdSeller);
   }
 
   /**
@@ -76,8 +83,28 @@ public class SellerController {
    * @return {@code 204 No Content} once the seller has been deleted
    */
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
-    this.sellerService.deleteSeller(id);
+  public ResponseEntity<Void> deleteSeller(@AuthenticationPrincipal User user, @PathVariable Long id) {
+    this.sellerService.deleteSeller(id, user.getId());
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Get a seller by user ID
+   */
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<SellerResponseDto> getSellerByUserId(@PathVariable Long userId) {
+    return ResponseEntity.ok(this.sellerService.getSellerByUserId(userId));
+  }
+
+  /**
+   * Update the seller of the authenticated user. The target user is taken from
+   * the JWT principal, never from the request body.
+   */
+  @PutMapping
+  public ResponseEntity<SellerResponseDto> updateSeller(
+      @AuthenticationPrincipal User user,
+      @RequestBody SellerRequestDto sellerRequestDto) {
+    SellerResponseDto updatedSeller = this.sellerService.updateSeller(user.getId(), sellerRequestDto);
+    return ResponseEntity.ok(updatedSeller);
   }
 }

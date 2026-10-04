@@ -3,6 +3,7 @@ package com.nicodev.iwanit.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -166,6 +167,21 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleArticleNotDeletedException(ArticleNotDeletedException ex) {
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ex.getMessage());
+  }
+
+  /**
+   * Handles AccessDeniedException and returns a 403 Forbidden response.
+   * Exception is thrown when the authenticated user tries to act on a resource
+   * owned by another user.
+   * 
+   * @param ex
+   * @return
+   */
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
+    return ResponseEntity
+        .status(HttpStatus.FORBIDDEN)
         .body(ex.getMessage());
   }
 

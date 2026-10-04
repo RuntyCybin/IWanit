@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { setToken } from '../auth'
+import { setToken, setRole, setUserId } from '../auth'
 
 // All API calls go through the /api prefix. In the container nginx proxies it
 // to the backend over the Docker network, so the browser only ever talks to a
@@ -42,8 +42,11 @@ async function submit() {
 
     const data = await res.json()
 
+    setUserId(data.userId)
+
     if (mode.value === 'login') {
       setToken(data.token)
+      setRole(data.role)
       router.push({ name: 'home' })
     } else {
       mode.value = 'login'

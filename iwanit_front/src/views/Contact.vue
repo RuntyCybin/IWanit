@@ -89,15 +89,15 @@ function submit() {
             <dl class="mt-4 space-y-3 text-sm">
               <div>
                 <dt class="font-medium text-slate-700">Email</dt>
-                <dd class="text-slate-500">contacto@cybindev.com</dd>
+                <dd class="text-slate-500">nico_dev@icloud.com</dd>
               </div>
               <div>
                 <dt class="font-medium text-slate-700">Sitio web</dt>
-                <dd class="text-slate-500">cybindev.com</dd>
+                <dd class="text-slate-500">nicodev.es/</dd>
               </div>
               <div>
                 <dt class="font-medium text-slate-700">Ubicacion</dt>
-                <dd class="text-slate-500">Argentina (remoto)</dd>
+                <dd class="text-slate-500">Estonia</dd>
               </div>
             </dl>
           </div>
