@@ -16,4 +16,6 @@ public interface ArticleService {
   ArticleResponseDto getArticleById(Long id);
 
   List<ArticleResponseDto> getAllBuyerArticles(Long buyerId);
+
+  List<ArticleResponseDto> getAllArticles();
 }
