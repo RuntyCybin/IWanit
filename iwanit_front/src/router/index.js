@@ -5,6 +5,7 @@ import AboutUs from '../views/AboutUs.vue'
 import Contact from '../views/Contact.vue'
 import Profile from '../views/Profile.vue'
 import CreateArticle from '../views/CreateArticle.vue'
+import Article from '../views/Article.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +16,7 @@ const router = createRouter({
     { path: '/contact', name: 'contact', component: Contact },
     { path: '/profile', name: 'profile', component: Profile },
     { path: '/articles/create', name: 'create-article', component: CreateArticle },
+    { path: '/articles/:id', name: 'article', component: Article, props: true },
   ],
 })
 

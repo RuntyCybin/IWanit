@@ -7,9 +7,11 @@ const API = '/api'
 
 const articles = ref([])
 
-async function fetchArticles(id) {
+async function fetchArticles(buyerId) {
+  const path = buyerId ? `/v1/articles/buyer/${buyerId}` : '/v1/articles'
+
   try {
-    const res = await fetch(`${API}/v1/articles/buyer/${id}`, {
+    const res = await fetch(API + path, {
       headers: { Authorization: `Bearer ${token.value}` },
     })
 
@@ -24,7 +26,7 @@ async function fetchArticles(id) {
 // Al entrar a Home traemos los datos del buyer/seller asociados al userId
 // logueado y los guardamos en localStorage, para que el resto de la app
 // (navbar, perfil) los tenga disponibles sin pedirlos de nuevo. Si es un
-// buyer, con su buyerId pedimos ademas sus articulos.
+// buyer pedimos sus articulos (por buyerId); si es seller, todos los articulos.
 onMounted(async () => {
   if (!userId.value || !role.value) return
 
@@ -52,6 +54,8 @@ onMounted(async () => {
     if (role.value === 'BUYER') {
       setBuyerId(data.id)
       await fetchArticles(data.id)
+    } else if (role.value === 'SELLER') {
+      await fetchArticles()
     }
   } catch (e) {
     // sin conexion a la API: se mantienen los datos ya guardados en localStorage
@@ -90,15 +94,17 @@ function formatPrice(price) {
         </p>
 
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <article
+          <router-link
             v-for="article in articles"
             :key="article.id"
-            class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col"
+            :to="{ name: 'article', params: { id: article.id } }"
+            class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col
+                   transition hover:border-slate-300"
           >
             <h2 class="text-base font-medium text-slate-900">{{ article.title }}</h2>
             <p class="mt-2 text-sm text-slate-500 flex-1">{{ article.content }}</p>
             <p class="mt-3 text-lg font-semibold text-slate-900">{{ formatPrice(article.price) }}</p>
-          </article>
+          </router-link>
         </div>
       </div>
     </main>
