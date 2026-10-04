@@ -120,4 +120,11 @@ public class ArticleServiceImpl implements ArticleService {
         .toList();
   }
 
+  @Override
+  public List<ArticleResponseDto> getAllArticles() {
+    return this.articleRepository.findAll().stream()
+        .map(articleMapper::toArticleResponseDto)
+        .toList();
+  }
+
 }

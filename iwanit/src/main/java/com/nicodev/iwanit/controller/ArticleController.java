@@ -34,6 +34,11 @@ public class ArticleController {
         .body(cfreatedArticle);
   }
 
+  @GetMapping
+  public ResponseEntity<List<ArticleResponseDto>> getAllArticles() {
+    return ResponseEntity.ok(this.articleService.getAllArticles());
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<ArticleResponseDto> getArticle(@PathVariable Long id) {
     return ResponseEntity.ok(this.articleService.getArticleById(id));
