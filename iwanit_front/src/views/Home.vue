@@ -76,6 +76,7 @@ function formatPrice(price) {
           </div>
 
           <router-link
+            v-if="role !== 'SELLER'"
             :to="{ name: 'create-article' }"
             class="shrink-0 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white
                    transition hover:bg-slate-800"

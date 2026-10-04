@@ -1,8 +1,8 @@
 package com.nicodev.iwanit.model.dto;
 
-public record SellerRequestDto(String name, String email, String phoneNumber, Long userId) {
+public record SellerRequestDto(String name, String email, String phoneNumber) {
 
-  public SellerRequestDto(String name, String email, String phoneNumber, Long userId) {
+  public SellerRequestDto(String name, String email, String phoneNumber) {
     if (name == null || name.isBlank()) {
       throw new IllegalArgumentException("Name cannot be null or blank");
     }
@@ -18,11 +18,6 @@ public record SellerRequestDto(String name, String email, String phoneNumber, Lo
       throw new IllegalArgumentException("Invalid or blank phone number");
     }
     this.phoneNumber = phoneNumber;
-
-    if (userId == null || userId <= 0) {
-      throw new IllegalArgumentException("Invalid user ID");
-    }
-    this.userId = userId;
 
   }
 

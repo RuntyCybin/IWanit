@@ -3,6 +3,7 @@ package com.nicodev.iwanit.service;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.model.dto.SellerRequestDto;
@@ -24,10 +25,11 @@ public class SellerServiceImpl implements SellerService {
 
   @Override
   @Transactional
-  public SellerResponseDto createSeller(SellerRequestDto sellerRequestDto) {
+  public SellerResponseDto createSeller(Long userId, SellerRequestDto sellerRequestDto) {
+    Objects.requireNonNull(userId, "User ID must not be null");
     Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
 
-    var user = userRepository.findById(sellerRequestDto.userId())
+    var user = userRepository.findById(userId)
         .orElseThrow(() -> new RuntimeException("User not found with email: " + sellerRequestDto.email()));
 
     var seller = this.sellerMapper.mapSellerRequestToSeller(sellerRequestDto, user);
@@ -58,11 +60,15 @@ public class SellerServiceImpl implements SellerService {
 
   @Override
   @Transactional
-  public void deleteSeller(Long id) {
+  public void deleteSeller(Long id, Long userId) {
     Objects.requireNonNull(id, "Seller ID must not be null");
+    Objects.requireNonNull(userId, "User ID must not be null");
 
     sellerRepository.findById(id).ifPresentOrElse(
         seller -> {
+          if (!seller.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Seller " + id + " does not belong to the authenticated user");
+          }
           try {
             sellerRepository.delete(seller);
           } catch (Exception e) {
@@ -86,11 +92,12 @@ public class SellerServiceImpl implements SellerService {
 
   @Override
   @Transactional
-  public SellerResponseDto updateSeller(SellerRequestDto sellerRequestDto) {
+  public SellerResponseDto updateSeller(Long userId, SellerRequestDto sellerRequestDto) {
+    Objects.requireNonNull(userId, "User ID must not be null");
     Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
 
-    var updatedSeller = sellerRepository.findByUserId(sellerRequestDto.userId())
-        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + sellerRequestDto.userId()));
+    var updatedSeller = sellerRepository.findByUserId(userId)
+        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + userId));
 
     updatedSeller.setName(sellerRequestDto.name());
     updatedSeller.setEmail(sellerRequestDto.email());
@@ -100,7 +107,7 @@ public class SellerServiceImpl implements SellerService {
       var savedSeller = sellerRepository.save(updatedSeller);
       return this.sellerMapper.mapSellerToResponse(savedSeller);
     } catch (Exception e) {
-      throw new RuntimeException("Failed to update seller for user ID: " + sellerRequestDto.userId(), e);
+      throw new RuntimeException("Failed to update seller for user ID: " + userId, e);
     }
   }
 

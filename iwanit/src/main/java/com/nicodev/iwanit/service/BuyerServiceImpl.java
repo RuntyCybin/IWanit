@@ -2,6 +2,7 @@ package com.nicodev.iwanit.service;
 
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.BuyerNotDeletedException;
@@ -27,11 +28,12 @@ public class BuyerServiceImpl implements BuyerService {
 
   @Override
   @Transactional
-  public BuyerResponseDto createBuyer(BuyerRequestDto buyerRequestDto) {
+  public BuyerResponseDto createBuyer(Long userId, BuyerRequestDto buyerRequestDto) {
 
+    Objects.requireNonNull(userId, "User ID must not be null");
     Objects.requireNonNull(buyerRequestDto);
 
-    var user = userRepository.findById(buyerRequestDto.userId())
+    var user = userRepository.findById(userId)
         .orElseThrow(() -> new UserNotFoundException(buyerRequestDto.email()));
 
     var buyer = buyerMapper.mapBuyerRequestDtoToBuyer(buyerRequestDto, user);
@@ -64,11 +66,16 @@ public class BuyerServiceImpl implements BuyerService {
 
   @Override
   @Transactional
-  public void deleteBuyer(Long id) {
+  public void deleteBuyer(Long id, Long userId) {
     Objects.requireNonNull(id, "Buyer ID must not be null");
+    Objects.requireNonNull(userId, "User ID must not be null");
 
     var buyer = buyerRepository.findById(id)
         .orElseThrow(() -> new BuyerNotFoundException(id, "Buyer not found"));
+
+    if (!buyer.getUser().getId().equals(userId)) {
+      throw new AccessDeniedException("Buyer " + id + " does not belong to the authenticated user");
+    }
 
     try {
       buyerRepository.delete(buyer);
@@ -89,11 +96,12 @@ public class BuyerServiceImpl implements BuyerService {
 
   @Override
   @Transactional
-  public BuyerResponseDto updateBuyer(BuyerRequestDto buyerRequestDto) {
+  public BuyerResponseDto updateBuyer(Long userId, BuyerRequestDto buyerRequestDto) {
+    Objects.requireNonNull(userId, "User ID must not be null");
     Objects.requireNonNull(buyerRequestDto, "BuyerRequestDto must not be null");
 
-    var updatedBuyer = buyerRepository.findByUserId(buyerRequestDto.userId())
-        .orElseThrow(() -> new BuyerNotFoundException(buyerRequestDto.userId(), "Buyer not found for user ID"));
+    var updatedBuyer = buyerRepository.findByUserId(userId)
+        .orElseThrow(() -> new BuyerNotFoundException(userId, "Buyer not found for user ID"));
 
     updatedBuyer.setName(buyerRequestDto.name());
     updatedBuyer.setEmail(buyerRequestDto.email());
