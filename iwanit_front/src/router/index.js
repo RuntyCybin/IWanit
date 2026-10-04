@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import AboutUs from '../views/AboutUs.vue'
 import Contact from '../views/Contact.vue'
 import Profile from '../views/Profile.vue'
+import CreateArticle from '../views/CreateArticle.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,6 +14,7 @@ const router = createRouter({
     { path: '/about', name: 'about', component: AboutUs },
     { path: '/contact', name: 'contact', component: Contact },
     { path: '/profile', name: 'profile', component: Profile },
+    { path: '/articles/create', name: 'create-article', component: CreateArticle },
   ],
 })
 

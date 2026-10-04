@@ -8,6 +8,7 @@ export const avatarUrl = ref(localStorage.getItem('avatarUrl'))
 export const email = ref(localStorage.getItem('email'))
 export const name = ref(localStorage.getItem('name'))
 export const phoneNumber = ref(localStorage.getItem('phoneNumber'))
+export const buyerId = ref(localStorage.getItem('buyerId'))
 
 export function setToken(value) {
   token.value = value
@@ -44,6 +45,11 @@ export function setPhoneNumber(value) {
   localStorage.setItem('phoneNumber', value)
 }
 
+export function setBuyerId(value) {
+  buyerId.value = value
+  localStorage.setItem('buyerId', value)
+}
+
 export function logout() {
   token.value = null
   userId.value = null
@@ -52,6 +58,7 @@ export function logout() {
   email.value = null
   name.value = null
   phoneNumber.value = null
+  buyerId.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('userId')
   localStorage.removeItem('role')
@@ -59,6 +66,7 @@ export function logout() {
   localStorage.removeItem('email')
   localStorage.removeItem('name')
   localStorage.removeItem('phoneNumber')
+  localStorage.removeItem('buyerId')
   router.push({ name: 'login' })
 }
 
@@ -74,6 +82,7 @@ window.addEventListener('storage', (event) => {
     email.value = null
     name.value = null
     phoneNumber.value = null
+    buyerId.value = null
     router.push({ name: 'login' })
   }
 })

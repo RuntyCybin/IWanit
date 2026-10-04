@@ -39,6 +39,12 @@ public class ArticleController {
     return ResponseEntity.ok(this.articleService.getArticleById(id));
   }
 
+  /**
+   * Gets all the articles of a buyer
+   * 
+   * @param buyerId
+   * @return
+   */
   @GetMapping("/buyer/{buyerId}")
   public ResponseEntity<List<ArticleResponseDto>> getAllBuyerArticles(@PathVariable Long buyerId) {
     return ResponseEntity.ok(this.articleService.getAllBuyerArticles(buyerId));
