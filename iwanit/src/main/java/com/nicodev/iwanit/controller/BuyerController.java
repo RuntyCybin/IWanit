@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 import com.nicodev.iwanit.service.BuyerService;
@@ -34,8 +36,9 @@ public class BuyerController {
    */
   @PostMapping
   public ResponseEntity<BuyerResponseDto> createBuyer(
+      @AuthenticationPrincipal User user,
       @RequestBody BuyerRequestDto buyerRequestDto) {
-    BuyerResponseDto createdBuyer = this.buyerService.createBuyer(buyerRequestDto);
+    BuyerResponseDto createdBuyer = this.buyerService.createBuyer(user.getId(), buyerRequestDto);
     return ResponseEntity
         .created(URI.create("/v1/buyers/" + createdBuyer.id()))
         .body(createdBuyer);
@@ -69,8 +72,8 @@ public class BuyerController {
    * @return
    */
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteBuyer(@PathVariable Long id) {
-    this.buyerService.deleteBuyer(id);
+  public ResponseEntity<Void> deleteBuyer(@AuthenticationPrincipal User user, @PathVariable Long id) {
+    this.buyerService.deleteBuyer(id, user.getId());
     return ResponseEntity.noContent().build();
   }
 
@@ -83,11 +86,14 @@ public class BuyerController {
   }
 
   /**
-   * Update a buyer
+   * Update the buyer of the authenticated user. The target user is taken from
+   * the JWT principal, never from the request body.
    */
   @PutMapping
-  public ResponseEntity<BuyerResponseDto> updateBuyer(@RequestBody BuyerRequestDto buyerRequestDto) {
-    BuyerResponseDto updatedBuyer = this.buyerService.updateBuyer(buyerRequestDto);
+  public ResponseEntity<BuyerResponseDto> updateBuyer(
+      @AuthenticationPrincipal User user,
+      @RequestBody BuyerRequestDto buyerRequestDto) {
+    BuyerResponseDto updatedBuyer = this.buyerService.updateBuyer(user.getId(), buyerRequestDto);
     return ResponseEntity.ok(updatedBuyer);
   }
 }

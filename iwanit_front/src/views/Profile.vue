@@ -5,7 +5,6 @@ import {
   name as savedName,
   email as savedEmail,
   phoneNumber as savedPhoneNumber,
-  userId,
   role,
   token,
   setName,
@@ -24,11 +23,12 @@ const loading = ref(false)
 
 // Si ya habia algun dato guardado (completo o parcial) antes de abrir el
 // formulario, el buyer/seller ya existe en el backend y hay que actualizarlo
-// (PUT) en vez de crearlo (POST).
-const hasExistingData = !!(savedName.value || savedEmail.value || savedPhoneNumber.value)
+// (PUT) en vez de crearlo (POST). Se actualiza a true tras el primer POST
+// exitoso para que un segundo guardado en la misma visita ya use PUT.
+const hasExistingData = ref(!!(savedName.value || savedEmail.value || savedPhoneNumber.value))
 
-// userId y role no se editan en este formulario: vienen del login/registro y solo
-// se usan para identificar de quien son los datos al guardar el perfil.
+// role no se edita en este formulario: viene del login/registro y solo se usa
+// para elegir el endpoint. El backend identifica al usuario a partir del token.
 async function submit() {
   loading.value = true
   error.value = ''
@@ -46,12 +46,11 @@ async function submit() {
     name: name.value,
     email: email.value,
     phoneNumber: phoneNumber.value,
-    userId: Number(userId.value),
   }
 
   try {
     const res = await fetch(API + path, {
-      method: hasExistingData ? 'PUT' : 'POST',
+      method: hasExistingData.value ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token.value}`,
@@ -68,6 +67,7 @@ async function submit() {
     setEmail(email.value)
     setPhoneNumber(phoneNumber.value)
     saved.value = true
+    hasExistingData.value = true
   } catch (e) {
     error.value = 'No se pudo contactar la API'
   } finally {
