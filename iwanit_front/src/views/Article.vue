@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
-import { role, token, buyerId } from '../auth'
+import { role, token, buyerId, sellerId } from '../auth'
 
 const props = defineProps({
   id: { type: String, required: true },
@@ -96,6 +96,8 @@ function clear() {
 const showOfferModal = ref(false)
 const offerPrice = ref('')
 const offerMessage = ref('')
+const offerSaving = ref(false)
+const offerError = ref('')
 
 function makeOffer() {
   showOfferModal.value = true
@@ -105,11 +107,42 @@ function closeOfferModal() {
   showOfferModal.value = false
   offerPrice.value = ''
   offerMessage.value = ''
+  offerError.value = ''
 }
 
-function submitOffer() {
-  // Todavia no hay un endpoint de ofertas: queda pendiente de implementar.
-  closeOfferModal()
+async function submitOffer() {
+  offerSaving.value = true
+  offerError.value = ''
+
+  const body = {
+    name: `${title.value} ${sellerId.value}`,
+    description: offerMessage.value,
+    price: Number(offerPrice.value),
+    articleId: Number(props.id),
+    sellerId: Number(sellerId.value),
+  }
+
+  try {
+    const res = await fetch(`${API}/v1/offers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      offerError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    closeOfferModal()
+  } catch (e) {
+    offerError.value = 'No se pudo contactar la API'
+  } finally {
+    offerSaving.value = false
+  }
 }
 </script>
 
@@ -242,10 +275,11 @@ function submitOffer() {
           <div class="flex gap-2">
             <button
               type="submit"
+              :disabled="offerSaving"
               class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white
-                     transition hover:bg-slate-800"
+                     transition hover:bg-slate-800 disabled:opacity-50"
             >
-              Enviar oferta
+              {{ offerSaving ? 'Enviando...' : 'Enviar oferta' }}
             </button>
             <button
               type="button"
@@ -256,6 +290,10 @@ function submitOffer() {
               Cancelar
             </button>
           </div>
+
+          <p v-if="offerError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ offerError }}
+          </p>
         </form>
       </div>
     </div>
