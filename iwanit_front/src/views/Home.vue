@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
-import { userId, role, token, setEmail, setName, setPhoneNumber, setBuyerId } from '../auth'
+import { userId, role, token, setEmail, setName, setPhoneNumber, setBuyerId, setSellerId } from '../auth'
 
 const API = '/api'
 
@@ -55,6 +55,7 @@ onMounted(async () => {
       setBuyerId(data.id)
       await fetchArticles(data.id)
     } else if (role.value === 'SELLER') {
+      setSellerId(data.id)
       await fetchArticles()
     }
   } catch (e) {

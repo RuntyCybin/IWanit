@@ -37,6 +37,12 @@ public class OfferController {
     return ResponseEntity.ok(this.offerService.getOffer(id));
   }
 
+  /**
+   * Get all offers for a specific seller.
+   * 
+   * @param sellerId
+   * @return
+   */
   @GetMapping("/seller/{sellerId}")
   public ResponseEntity<List<OfferResponseDto>> getAllSellerOffers(@PathVariable Long sellerId) {
     return ResponseEntity.ok(this.offerService.getAllSellerOffers(sellerId));
