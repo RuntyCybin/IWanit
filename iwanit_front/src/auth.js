@@ -9,6 +9,7 @@ export const email = ref(localStorage.getItem('email'))
 export const name = ref(localStorage.getItem('name'))
 export const phoneNumber = ref(localStorage.getItem('phoneNumber'))
 export const buyerId = ref(localStorage.getItem('buyerId'))
+export const sellerId = ref(localStorage.getItem('sellerId'))
 
 export function setToken(value) {
   token.value = value
@@ -50,6 +51,11 @@ export function setBuyerId(value) {
   localStorage.setItem('buyerId', value)
 }
 
+export function setSellerId(value) {
+  sellerId.value = value
+  localStorage.setItem('sellerId', value)
+}
+
 export function logout() {
   token.value = null
   userId.value = null
@@ -59,6 +65,7 @@ export function logout() {
   name.value = null
   phoneNumber.value = null
   buyerId.value = null
+  sellerId.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('userId')
   localStorage.removeItem('role')
@@ -67,6 +74,7 @@ export function logout() {
   localStorage.removeItem('name')
   localStorage.removeItem('phoneNumber')
   localStorage.removeItem('buyerId')
+  localStorage.removeItem('sellerId')
   router.push({ name: 'login' })
 }
 
@@ -83,6 +91,7 @@ window.addEventListener('storage', (event) => {
     name.value = null
     phoneNumber.value = null
     buyerId.value = null
+    sellerId.value = null
     router.push({ name: 'login' })
   }
 })
