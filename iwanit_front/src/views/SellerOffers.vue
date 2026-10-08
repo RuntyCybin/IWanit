@@ -93,6 +93,32 @@ async function saveEdit(offer) {
     saving.value = false
   }
 }
+
+const deletingId = ref(null)
+const deleteError = ref('')
+
+async function deleteOffer(offer) {
+  deletingId.value = offer.id
+  deleteError.value = ''
+
+  try {
+    const res = await fetch(`${API}/v1/offers/${offer.id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) {
+      deleteError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    offers.value = offers.value.filter((o) => o.id !== offer.id)
+  } catch (e) {
+    deleteError.value = 'No se pudo contactar la API'
+  } finally {
+    deletingId.value = null
+  }
+}
 </script>
 
 <template>
@@ -133,6 +159,15 @@ async function saveEdit(offer) {
                   @click="startEdit(offer)"
                 >
                   Editar
+                </button>
+                <button
+                  type="button"
+                  :disabled="deletingId === offer.id"
+                  class="rounded-lg bg-white px-3 py-2 text-sm font-medium text-red-600
+                         border border-slate-200 transition hover:bg-red-50 disabled:opacity-50"
+                  @click="deleteOffer(offer)"
+                >
+                  {{ deletingId === offer.id ? 'Eliminando...' : 'Eliminar' }}
                 </button>
               </div>
             </div>
@@ -189,6 +224,10 @@ async function saveEdit(offer) {
             </form>
           </li>
         </ul>
+
+        <p v-if="deleteError" class="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {{ deleteError }}
+        </p>
       </div>
     </main>
   </div>

@@ -15,4 +15,6 @@ public interface OfferService {
   OfferResponseDto updateOffer(Long id, OfferRequestDto offerRequestDto);
 
   void deleteOffer(Long id);
+
+  List<OfferResponseDto> getOffersByArticleId(Long articleId);
 }

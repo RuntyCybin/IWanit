@@ -54,9 +54,24 @@ public class OfferController {
     return ResponseEntity.ok(this.offerService.updateOffer(id, offerRequestDto));
   }
 
+  /**
+   * Buyer can delete an offer from the Article view
+   * Seller can delete an offer from the Mis Ofertas view
+   */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteOffer(@PathVariable Long id) {
     this.offerService.deleteOffer(id);
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Endpoint to get all offers for a specific article.
+   * 
+   * @param articleId
+   * @return
+   */
+  @GetMapping("/article/{articleId}")
+  public ResponseEntity<List<OfferResponseDto>> getOffersByArticleId(@PathVariable Long articleId) {
+    return ResponseEntity.ok(this.offerService.getOffersByArticleId(articleId));
   }
 }

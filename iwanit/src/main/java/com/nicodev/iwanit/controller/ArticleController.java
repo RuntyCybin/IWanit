@@ -34,6 +34,12 @@ public class ArticleController {
         .body(cfreatedArticle);
   }
 
+  /**
+   * Gets all the articles
+   * Called on the Home page to display all the articles
+   * 
+   * @return
+   */
   @GetMapping
   public ResponseEntity<List<ArticleResponseDto>> getAllArticles() {
     return ResponseEntity.ok(this.articleService.getAllArticles());
