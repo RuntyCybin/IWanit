@@ -1,21 +1,36 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
-import { userId, role, token, buyerId, setEmail, setName, setPhoneNumber, setBuyerId, setSellerId } from '../auth'
+import { userId, role, token, buyerId, sellerId, setEmail, setName, setPhoneNumber, setBuyerId, setSellerId } from '../auth'
 
 const API = '/api'
 
 const articles = ref([])
 
+// Para un buyer, este endpoint devuelve el mismo listado completo de
+// articulos pero con offersCount incluido (para el aviso de ofertas nuevas).
+// Los sellers no tienen buyerId, asi que siguen viendo el listado simple.
 async function fetchArticles() {
+  const path = buyerId.value ? `/v1/articles/offers-count` : '/v1/articles'
+
   try {
-    const res = await fetch(`${API}/v1/articles`, {
+    const res = await fetch(API + path, {
       headers: { Authorization: `Bearer ${token.value}` },
     })
 
     if (!res.ok) return
 
-    articles.value = await res.json()
+    const data = await res.json()
+    articles.value = data.map((article) => ({
+      id: article.id,
+      title: article.title ?? article.name,
+      content: article.content ?? article.description,
+      price: article.price,
+      buyer: article.buyer ?? article.buyerId,
+      seller: article.seller ?? article.sellerId,
+      offersCount: article.offersCount ?? 0,
+      offers: article.offers ?? [],
+    }))
   } catch (e) {
     // sin conexion a la API: se mantiene la lista vacia
   }
@@ -58,22 +73,30 @@ async function fetchUserProfile() {
   }
 }
 
-// Tanto buyers como sellers ven aqui el listado completo de articulos. Las
-// dos llamadas son independientes entre si, asi que se lanzan en paralelo.
-onMounted(() => {
-  fetchUserProfile()
-  fetchArticles()
+// Tanto buyers como sellers ven aqui el listado completo de articulos.
+// fetchArticles necesita el buyerId (si lo hay), asi que espera a que
+// fetchUserProfile termine antes de decidir que endpoint llamar.
+onMounted(async () => {
+  await fetchUserProfile()
+  await fetchArticles()
 })
 
 function formatPrice(price) {
   return price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
 }
 
-// Un buyer solo puede abrir sus propios articulos; un seller puede abrir
-// cualquiera (para poder hacerle una oferta).
+// Un buyer solo puede abrir sus propios articulos. Un seller puede abrir
+// cualquiera excepto los que ya tienen una oferta suya.
 function canOpen(article) {
-  if (role.value !== 'BUYER') return true
-  return Number(article.buyer) === Number(buyerId.value)
+  if (role.value === 'BUYER') {
+    return Number(article.buyer) === Number(buyerId.value)
+  }
+
+  if (role.value === 'SELLER') {
+    return !article.offers.some((offer) => Number(offer.sellerId) === Number(sellerId.value))
+  }
+
+  return true
 }
 </script>
 
@@ -108,9 +131,13 @@ function canOpen(article) {
             <router-link
               v-if="canOpen(article)"
               :to="{ name: 'article', params: { id: article.id } }"
-              class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col
+              class="relative bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col
                      transition hover:border-slate-300"
             >
+              <span
+                v-if="article.offersCount >= 1"
+                class="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-500 ring-2 ring-white"
+              />
               <h2 class="text-base font-medium text-slate-900">{{ article.title }}</h2>
               <p class="mt-2 text-sm text-slate-500 flex-1">{{ article.content }}</p>
               <p class="mt-3 text-lg font-semibold text-slate-900">{{ formatPrice(article.price) }}</p>
@@ -118,9 +145,13 @@ function canOpen(article) {
 
             <div
               v-else
-              class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col
+              class="relative bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col
                      opacity-60 cursor-not-allowed"
             >
+              <span
+                v-if="article.offersCount >= 1"
+                class="absolute -right-1.5 -top-1.5 h-3 w-3 rounded-full bg-red-500 ring-2 ring-white"
+              />
               <h2 class="text-base font-medium text-slate-900">{{ article.title }}</h2>
               <p class="mt-2 text-sm text-slate-500 flex-1">{{ article.content }}</p>
               <p class="mt-3 text-lg font-semibold text-slate-900">{{ formatPrice(article.price) }}</p>

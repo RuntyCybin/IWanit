@@ -1,9 +1,13 @@
 package com.nicodev.iwanit.model.dto;
 
-public record ArticleResponseDto(Long id, String title, String content, Double price, Long buyer, Long seller) {
+import java.util.List;
 
-  public ArticleResponseDto(Long id, String title, String content, Double price, Long buyer) {
-    this(id, title, content, price, buyer, null);
-  }
+public record ArticleResponseDto(
+    Long id,
+    String title,
+    String content,
+    Double price,
+    Long buyer,
+    List<OfferResponseDto> offers) {
 
 }
