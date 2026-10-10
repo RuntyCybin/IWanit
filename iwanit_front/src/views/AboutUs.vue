@@ -34,6 +34,16 @@ import NavBar from '../components/NavBar.vue'
           </section>
 
           <section>
+            <h2 class="text-base font-medium text-slate-900">El punto rojo</h2>
+            <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+              Un pequeno circulo rojo en la esquina de un icono es un aviso de que hay algo pendiente
+              de revisar. En el icono de perfil de la barra de navegacion indica que todavia no
+              completaste tu email, nombre o telefono. En el listado de articulos de Home indica que
+              ese articulo ya recibio al menos una oferta.
+            </p>
+          </section>
+
+          <section>
             <h2 class="text-base font-medium text-slate-900">En que estamos trabajando</h2>
             <p class="mt-2 text-sm text-slate-600 leading-relaxed">
               El proyecto esta en desarrollo activo. Estamos construyendo las funcionalidades
