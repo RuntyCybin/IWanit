@@ -6,6 +6,7 @@ import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.dto.ArticleRequestDto;
 import com.nicodev.iwanit.model.dto.ArticleResponseDto;
+import com.nicodev.iwanit.model.dto.OfferResponseDto;
 
 @Component
 public class ArticleMapper {
@@ -16,7 +17,16 @@ public class ArticleMapper {
         article.getName(),
         article.getDescription(),
         article.getPrice(),
-        article.getBuyer().getId());
+        article.getBuyer().getId(),
+        article.getOffers().stream()
+            .map(offer -> new OfferResponseDto(
+                offer.getId(),
+                offer.getName(),
+                offer.getDescription(),
+                offer.getPrice(),
+                article.getId(),
+                offer.getSeller().getId()))
+            .toList());
   }
 
   public Article mapToArticle(ArticleRequestDto articleRequestDto, Buyer buyer) {

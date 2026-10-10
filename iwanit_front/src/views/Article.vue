@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
 import { role, token, buyerId, sellerId } from '../auth'
 
@@ -43,7 +43,73 @@ async function fetchArticle() {
   }
 }
 
-onMounted(fetchArticle)
+const offers = ref([])
+const offersLoading = ref(false)
+const offersError = ref('')
+
+// Una vez que el articulo tiene alguna oferta, el buyer ya no puede
+// seguir editandolo.
+const hasOffers = computed(() => offers.value.length > 0)
+
+async function fetchOffers() {
+  offersLoading.value = true
+  offersError.value = ''
+
+  try {
+    const res = await fetch(`${API}/v1/offers/article/${props.id}`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) {
+      offersError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    offers.value = await res.json()
+  } catch (e) {
+    offersError.value = 'No se pudo contactar la API'
+  } finally {
+    offersLoading.value = false
+  }
+}
+
+const deletingOfferId = ref(null)
+const deleteOfferError = ref('')
+
+async function deleteOffer(offer) {
+  deletingOfferId.value = offer.id
+  deleteOfferError.value = ''
+
+  try {
+    const res = await fetch(`${API}/v1/offers/${offer.id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) {
+      deleteOfferError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    offers.value = offers.value.filter((o) => o.id !== offer.id)
+  } catch (e) {
+    deleteOfferError.value = 'No se pudo contactar la API'
+  } finally {
+    deletingOfferId.value = null
+  }
+}
+
+onMounted(() => {
+  fetchArticle()
+
+  if (role.value === 'BUYER') {
+    fetchOffers()
+  }
+})
+
+function formatPrice(value) {
+  return value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })
+}
 
 async function submit() {
   if (!buyerId.value) {
@@ -165,7 +231,7 @@ async function submitOffer() {
             <input
               v-model="title"
               type="text"
-              :disabled="role !== 'BUYER'"
+              :disabled="role !== 'BUYER' || hasOffers"
               class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
                      focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900
                      disabled:bg-slate-100 disabled:text-slate-500"
@@ -177,7 +243,7 @@ async function submitOffer() {
             <textarea
               v-model="content"
               rows="4"
-              :disabled="role !== 'BUYER'"
+              :disabled="role !== 'BUYER' || hasOffers"
               class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
                      focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900
                      disabled:bg-slate-100 disabled:text-slate-500"
@@ -191,7 +257,7 @@ async function submitOffer() {
               type="number"
               min="0"
               step="0.01"
-              :disabled="role !== 'BUYER'"
+              :disabled="role !== 'BUYER' || hasOffers"
               class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
                      focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900
                      disabled:bg-slate-100 disabled:text-slate-500"
@@ -201,7 +267,7 @@ async function submitOffer() {
           <div v-if="role === 'BUYER'" class="flex gap-2">
             <button
               type="submit"
-              :disabled="saving"
+              :disabled="saving || hasOffers"
               class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white
                      transition hover:bg-slate-800 disabled:opacity-50"
             >
@@ -209,8 +275,9 @@ async function submitOffer() {
             </button>
             <button
               type="button"
+              :disabled="hasOffers"
               class="flex-1 rounded-lg bg-white px-3 py-2 text-sm font-medium text-slate-600
-                     border border-slate-200 transition hover:bg-slate-50"
+                     border border-slate-200 transition hover:bg-slate-50 disabled:opacity-50"
               @click="clear"
             >
               Limpiar
@@ -227,6 +294,10 @@ async function submitOffer() {
             Hacer oferta
           </button>
 
+          <p v-if="role === 'BUYER' && hasOffers" class="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">
+            Este articulo ya tiene ofertas y no se puede modificar.
+          </p>
+
           <p v-if="saved" class="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
             Articulo actualizado correctamente.
           </p>
@@ -235,6 +306,53 @@ async function submitOffer() {
             {{ error }}
           </p>
         </form>
+
+        <div v-if="role === 'BUYER'" class="mt-6">
+          <h2 class="text-lg font-semibold text-slate-900">Ofertas recibidas</h2>
+
+          <p v-if="offersError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ offersError }}
+          </p>
+
+          <p v-else-if="!offersLoading && offers.length === 0" class="mt-3 text-sm text-slate-500">
+            Todavia no hay ofertas para este articulo.
+          </p>
+
+          <ul
+            v-else
+            class="mt-3 divide-y divide-slate-200 bg-white rounded-xl shadow-sm border border-slate-200"
+          >
+            <li
+              v-for="offer in offers"
+              :key="offer.id"
+              class="p-4 flex items-center justify-between gap-4"
+            >
+              <div>
+                <h3 class="text-base font-medium text-slate-900">{{ offer.name }}</h3>
+                <p class="mt-1 text-sm text-slate-500">{{ offer.description }}</p>
+              </div>
+
+              <div class="flex shrink-0 items-center gap-3">
+                <p class="text-base font-semibold text-slate-900">
+                  {{ formatPrice(offer.price) }}
+                </p>
+                <button
+                  type="button"
+                  :disabled="deletingOfferId === offer.id"
+                  class="rounded-lg bg-white px-3 py-2 text-sm font-medium text-red-600
+                         border border-slate-200 transition hover:bg-red-50 disabled:opacity-50"
+                  @click="deleteOffer(offer)"
+                >
+                  {{ deletingOfferId === offer.id ? 'Eliminando...' : 'Eliminar' }}
+                </button>
+              </div>
+            </li>
+          </ul>
+
+          <p v-if="deleteOfferError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ deleteOfferError }}
+          </p>
+        </div>
       </div>
     </main>
 

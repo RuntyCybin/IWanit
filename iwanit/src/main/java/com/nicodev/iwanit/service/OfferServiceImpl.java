@@ -110,4 +110,21 @@ public class OfferServiceImpl implements OfferService {
         .map(offerMapper::mapOfferToResponseDto)
         .toList();
   }
+
+  /**
+   * (non-Javadoc)
+   * Finds all offers associated with a specific article
+   * This service is called from the article view page to display all offers for a
+   * given article
+   * 
+   * @see com.nicodev.iwanit.service.OfferService#getOffersByArticleId(java.lang.Long)
+   */
+  @Override
+  public List<OfferResponseDto> getOffersByArticleId(Long articleId) {
+    Objects.requireNonNull(articleId, "Article ID must not be null");
+
+    return offerRepository.findAllByArticleId(articleId).stream()
+        .map(offerMapper::mapOfferToResponseDto)
+        .toList();
+  }
 }

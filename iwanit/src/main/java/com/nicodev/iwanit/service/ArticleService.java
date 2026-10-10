@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.nicodev.iwanit.model.dto.ArticleRequestDto;
 import com.nicodev.iwanit.model.dto.ArticleResponseDto;
+import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 
 public interface ArticleService {
 
@@ -18,4 +19,6 @@ public interface ArticleService {
   List<ArticleResponseDto> getAllBuyerArticles(Long buyerId);
 
   List<ArticleResponseDto> getAllArticles();
+
+  List<ArticleWithOffersCountDto> getAllArticlesWithCountByBuyerId();
 }

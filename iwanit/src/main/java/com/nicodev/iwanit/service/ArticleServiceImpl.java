@@ -14,6 +14,7 @@ import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.dto.ArticleRequestDto;
 import com.nicodev.iwanit.model.dto.ArticleResponseDto;
+import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 import com.nicodev.iwanit.model.mapper.ArticleMapper;
 import com.nicodev.iwanit.repository.ArticleRepository;
 import com.nicodev.iwanit.repository.BuyerRepository;
@@ -125,6 +126,12 @@ public class ArticleServiceImpl implements ArticleService {
     return this.articleRepository.findAll().stream()
         .map(articleMapper::toArticleResponseDto)
         .toList();
+  }
+
+  @Override
+  public List<ArticleWithOffersCountDto> getAllArticlesWithCountByBuyerId() {
+
+    return this.articleRepository.findAllByBuyerIdWithOffersCount();
   }
 
 }
