@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.nicodev.iwanit.model.dto.ArticleRequestDto;
 import com.nicodev.iwanit.model.dto.ArticleResponseDto;
+import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 import com.nicodev.iwanit.service.ArticleService;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +35,12 @@ public class ArticleController {
         .body(cfreatedArticle);
   }
 
+  /**
+   * Gets all the articles
+   * Called on the Home page to display all the articles
+   * 
+   * @return
+   */
   @GetMapping
   public ResponseEntity<List<ArticleResponseDto>> getAllArticles() {
     return ResponseEntity.ok(this.articleService.getAllArticles());
@@ -53,6 +60,17 @@ public class ArticleController {
   @GetMapping("/buyer/{buyerId}")
   public ResponseEntity<List<ArticleResponseDto>> getAllBuyerArticles(@PathVariable Long buyerId) {
     return ResponseEntity.ok(this.articleService.getAllBuyerArticles(buyerId));
+  }
+
+  /**
+   * Gets all the articles of a buyer with the number of offers of each one
+   *
+   * @param buyerId
+   * @return
+   */
+  @GetMapping("/offers-count")
+  public ResponseEntity<List<ArticleWithOffersCountDto>> getAllBuyerArticlesWithOffersCount() {
+    return ResponseEntity.ok(this.articleService.getAllArticlesWithCountByBuyerId());
   }
 
   @PutMapping("/{id}")

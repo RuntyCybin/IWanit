@@ -9,19 +9,37 @@ import org.springframework.data.repository.query.Param;
 
 import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
+import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-  Optional<Article> findByName(String name);
+    Optional<Article> findByName(String name);
 
-  Optional<Article> findByBuyer(Buyer buyer);
+    Optional<Article> findByBuyer(Buyer buyer);
 
-  // JOIN FETCH avoids N+1 when loading each article's buyer
-  @Query("SELECT a FROM Article a JOIN FETCH a.buyer b WHERE b.id = :buyerId")
-  List<Article> findAllByBuyerId(@Param("buyerId") Long buyerId);
+    // JOIN FETCH avoids N+1 when loading each article's buyer
+    @Query("SELECT a FROM Article a JOIN FETCH a.buyer b WHERE b.id = :buyerId")
+    List<Article> findAllByBuyerId(@Param("buyerId") Long buyerId);
 
-  // LEFT JOIN FETCH avoids N+1 when loading an article's offers (article may have
-  // none)
-  @Query("SELECT a FROM Article a LEFT JOIN FETCH a.offers WHERE a.id = :id")
-  Optional<Article> findByIdWithOffers(@Param("id") Long id);
+    // LEFT JOIN FETCH avoids N+1 when loading an article's offers (article may have
+    // none)
+    @Query("SELECT a FROM Article a LEFT JOIN FETCH a.offers WHERE a.id = :id")
+    Optional<Article> findByIdWithOffers(@Param("id") Long id);
+
+    /**
+     * Gets all the articles with the total number of offers received, across all
+     * sellers. The result has exactly one row per article.
+     * <p>
+     * Articles without offers are kept (LEFT JOIN) with {@code offersCount = 0}.
+     *
+     * @return the articles with their offers count
+     */
+    @Query("""
+            SELECT new com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto(
+                a.id, a.name, a.description, a.price, a.buyer.id, COUNT(o))
+            FROM Article a
+            LEFT JOIN a.offers o
+            GROUP BY a.id, a.name, a.description, a.price, a.buyer.id
+            """)
+    List<ArticleWithOffersCountDto> findAllByBuyerIdWithOffersCount();
 }

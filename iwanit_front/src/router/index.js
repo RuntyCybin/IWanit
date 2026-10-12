@@ -6,6 +6,8 @@ import Contact from '../views/Contact.vue'
 import Profile from '../views/Profile.vue'
 import CreateArticle from '../views/CreateArticle.vue'
 import Article from '../views/Article.vue'
+import BuyerArticles from '../views/BuyerArticles.vue'
+import SellerOffers from '../views/SellerOffers.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -16,6 +18,8 @@ const router = createRouter({
     { path: '/contact', name: 'contact', component: Contact },
     { path: '/profile', name: 'profile', component: Profile },
     { path: '/articles/create', name: 'create-article', component: CreateArticle },
+    { path: '/my-articles', name: 'buyer-articles', component: BuyerArticles },
+    { path: '/my-offers', name: 'seller-offers', component: SellerOffers },
     { path: '/articles/:id', name: 'article', component: Article, props: true },
   ],
 })
