@@ -27,24 +27,19 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
     Optional<Article> findByIdWithOffers(@Param("id") Long id);
 
     /**
-     * Gets the articles of a buyer with the number of offers received.
+     * Gets all the articles with the total number of offers received, across all
+     * sellers. The result has exactly one row per article.
      * <p>
-     * The result has one row per article and seller, where {@code offersCount} is
-     * the number of offers that seller made on that article. An article with
-     * offers from several sellers therefore appears several times.
-     * <p>
-     * Articles without offers are kept (LEFT JOIN) and appear once with
-     * {@code sellerId = null} and {@code offersCount = 0}.
+     * Articles without offers are kept (LEFT JOIN) with {@code offersCount = 0}.
      *
-     * @param buyerId id of the buyer who owns the articles
-     * @return the articles with their offers count, per seller
+     * @return the articles with their offers count
      */
     @Query("""
             SELECT new com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto(
-                a.id, a.name, a.description, a.price, a.buyer.id, o.seller.id, COUNT(o))
+                a.id, a.name, a.description, a.price, a.buyer.id, COUNT(o))
             FROM Article a
             LEFT JOIN a.offers o
-            GROUP BY a.id, a.name, a.description, a.price, a.buyer.id, o.seller.id
+            GROUP BY a.id, a.name, a.description, a.price, a.buyer.id
             """)
     List<ArticleWithOffersCountDto> findAllByBuyerIdWithOffersCount();
 }

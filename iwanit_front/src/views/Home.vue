@@ -27,7 +27,6 @@ async function fetchArticles() {
       content: article.content ?? article.description,
       price: article.price,
       buyer: article.buyer ?? article.buyerId,
-      seller: article.seller ?? article.sellerId,
       offersCount: article.offersCount ?? 0,
       offers: article.offers ?? [],
     }))
