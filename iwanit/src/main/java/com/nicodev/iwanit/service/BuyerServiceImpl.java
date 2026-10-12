@@ -9,6 +9,8 @@ import com.nicodev.iwanit.exception.BuyerNotDeletedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.exception.BuyerNotSavedException;
 import com.nicodev.iwanit.exception.UserNotFoundException;
+import com.nicodev.iwanit.model.Role;
+import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 import com.nicodev.iwanit.model.mapper.BuyerMapper;
@@ -48,18 +50,27 @@ public class BuyerServiceImpl implements BuyerService {
   }
 
   @Override
-  public List<BuyerResponseDto> getAllBuyers() {
+  public List<BuyerResponseDto> getAllBuyers(User caller) {
+    if (caller.getRole() != Role.ADMIN) {
+      throw new AccessDeniedException("Only admins can list all the buyers");
+    }
+
     return buyerRepository.findAll().stream()
         .map(buyerMapper::mapBuyerToResponseDto)
         .toList();
   }
 
   @Override
-  public BuyerResponseDto getBuyerById(Long id) {
+  public BuyerResponseDto getBuyerById(Long id, Long userId) {
     Objects.requireNonNull(id, "Buyer ID must not be null");
+    Objects.requireNonNull(userId, "User ID must not be null");
 
     var buyer = buyerRepository.findById(id)
         .orElseThrow(() -> new BuyerNotFoundException(id, "Buyer not found"));
+
+    if (!buyer.getUser().getId().equals(userId)) {
+      throw new AccessDeniedException("Buyer " + id + " does not belong to the authenticated user");
+    }
 
     return buyerMapper.mapBuyerToResponseDto(buyer);
   }
@@ -85,8 +96,13 @@ public class BuyerServiceImpl implements BuyerService {
   }
 
   @Override
-  public BuyerResponseDto getBuyerByUserId(Long userId) {
+  public BuyerResponseDto getBuyerByUserId(Long userId, Long authenticatedUserId) {
     Objects.requireNonNull(userId, "User ID must not be null");
+    Objects.requireNonNull(authenticatedUserId, "Authenticated user ID must not be null");
+
+    if (!userId.equals(authenticatedUserId)) {
+      throw new AccessDeniedException("Buyer data can only be read by its own user");
+    }
 
     var buyer = buyerRepository.findByUserId(userId)
         .orElseThrow(() -> new BuyerNotFoundException(userId, "Buyer not found for user ID"));

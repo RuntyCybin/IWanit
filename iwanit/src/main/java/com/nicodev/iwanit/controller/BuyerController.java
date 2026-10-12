@@ -51,8 +51,8 @@ public class BuyerController {
    * @return
    */
   @GetMapping("/{id}")
-  public ResponseEntity<BuyerResponseDto> getBuyer(@PathVariable Long id) {
-    return ResponseEntity.ok(this.buyerService.getBuyerById(id));
+  public ResponseEntity<BuyerResponseDto> getBuyer(@AuthenticationPrincipal User user, @PathVariable Long id) {
+    return ResponseEntity.ok(this.buyerService.getBuyerById(id, user.getId()));
   }
 
   /**
@@ -61,8 +61,8 @@ public class BuyerController {
    * @return
    */
   @GetMapping
-  public ResponseEntity<List<BuyerResponseDto>> getAllBuyers() {
-    return ResponseEntity.ok(this.buyerService.getAllBuyers());
+  public ResponseEntity<List<BuyerResponseDto>> getAllBuyers(@AuthenticationPrincipal User user) {
+    return ResponseEntity.ok(this.buyerService.getAllBuyers(user));
   }
 
   /**
@@ -81,8 +81,9 @@ public class BuyerController {
    * Get a buyer by user ID
    */
   @GetMapping("/user/{userId}")
-  public ResponseEntity<BuyerResponseDto> getBuyerByUserId(@PathVariable Long userId) {
-    return ResponseEntity.ok(this.buyerService.getBuyerByUserId(userId));
+  public ResponseEntity<BuyerResponseDto> getBuyerByUserId(@AuthenticationPrincipal User user,
+      @PathVariable Long userId) {
+    return ResponseEntity.ok(this.buyerService.getBuyerByUserId(userId, user.getId()));
   }
 
   /**
