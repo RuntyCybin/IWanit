@@ -1,19 +1,24 @@
 package com.nicodev.iwanit.model.mapper;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.Offer;
-import com.nicodev.iwanit.model.User;
+import com.nicodev.iwanit.model.Role;
+import com.nicodev.iwanit.model.StatusOffer;
 import com.nicodev.iwanit.model.dto.ArticleRequestDto;
 import com.nicodev.iwanit.model.dto.ArticleResponseDto;
 import com.nicodev.iwanit.model.dto.OfferResponseDto;
+import com.nicodev.iwanit.security.AuthenticatedUser;
+
+import lombok.AllArgsConstructor;
 
 @Component
+@AllArgsConstructor
 public class ArticleMapper {
+
+  private final AuthenticatedUser authenticatedUser;
 
   public ArticleResponseDto toArticleResponseDto(Article article) {
     return new ArticleResponseDto(
@@ -23,6 +28,7 @@ public class ArticleMapper {
         article.getPrice(),
         article.getBuyer().getId(),
         article.getOffers().stream()
+            .filter(offer -> offer.getStatus() == StatusOffer.PENDING)
             .filter(offer -> canSeeOffer(article, offer))
             .map(offer -> new OfferResponseDto(
                 offer.getId(),
@@ -39,18 +45,8 @@ public class ArticleMapper {
    * a seller only sees their own, and anybody else sees none.
    */
   private boolean canSeeOffer(Article article, Offer offer) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication == null || !(authentication.getPrincipal() instanceof User caller)) {
-      return false;
-    }
-
-    User owner = switch (caller.getRole()) {
-      case BUYER -> article.getBuyer().getUser();
-      case SELLER -> offer.getSeller().getUser();
-      default -> null;
-    };
-
-    return owner != null && caller.getId().equals(owner.getId());
+    return authenticatedUser.isOwner(Role.BUYER, article.getBuyer().getUser())
+        || authenticatedUser.isOwner(Role.SELLER, offer.getSeller().getUser());
   }
 
   public Article mapToArticle(ArticleRequestDto articleRequestDto, Buyer buyer) {

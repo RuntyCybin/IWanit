@@ -6,11 +6,16 @@ import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.nicodev.iwanit.exception.SellerNotFoundException;
+import com.nicodev.iwanit.exception.UserNotFoundException;
+import com.nicodev.iwanit.model.Role;
+import com.nicodev.iwanit.model.Seller;
 import com.nicodev.iwanit.model.dto.SellerRequestDto;
 import com.nicodev.iwanit.model.dto.SellerResponseDto;
 import com.nicodev.iwanit.model.mapper.SellerMapper;
 import com.nicodev.iwanit.repository.SellerRepository;
 import com.nicodev.iwanit.repository.UserRepository;
+import com.nicodev.iwanit.security.AuthenticatedUser;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,15 +27,23 @@ public class SellerServiceImpl implements SellerService {
   private final SellerRepository sellerRepository;
   private final UserRepository userRepository;
   private final SellerMapper sellerMapper;
+  private final AuthenticatedUser authenticatedUser;
 
+  /**
+   * Creates the seller of the authenticated user, who must have the SELLER role.
+   */
   @Override
   @Transactional
-  public SellerResponseDto createSeller(Long userId, SellerRequestDto sellerRequestDto) {
-    Objects.requireNonNull(userId, "User ID must not be null");
+  public SellerResponseDto createSeller(SellerRequestDto sellerRequestDto) {
     Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
 
+    if (!authenticatedUser.hasRole(Role.SELLER)) {
+      throw new AccessDeniedException("Only users with the SELLER role can create a seller");
+    }
+
+    Long userId = authenticatedUser.get().getId();
     var user = userRepository.findById(userId)
-        .orElseThrow(() -> new RuntimeException("User not found with email: " + sellerRequestDto.email()));
+        .orElseThrow(() -> new UserNotFoundException(userId.toString()));
 
     var seller = this.sellerMapper.mapSellerRequestToSeller(sellerRequestDto, user);
 
@@ -46,13 +59,22 @@ public class SellerServiceImpl implements SellerService {
   public SellerResponseDto getSellerById(Long id) {
     Objects.requireNonNull(id, "Seller ID must not be null");
 
-    return sellerRepository.findById(id)
-        .map(this.sellerMapper::mapSellerToResponse)
-        .orElseThrow(() -> new RuntimeException("Seller not found with ID: " + id));
+    Seller seller = sellerRepository.findById(id)
+        .orElseThrow(() -> new SellerNotFoundException(id));
+
+    if (!authenticatedUser.isOwner(Role.SELLER, seller.getUser())) {
+      throw new AccessDeniedException("Seller " + id + " does not belong to the authenticated user");
+    }
+
+    return this.sellerMapper.mapSellerToResponse(seller);
   }
 
   @Override
   public List<SellerResponseDto> getAllSellers() {
+    if (!authenticatedUser.hasRole(Role.ADMIN)) {
+      throw new AccessDeniedException("Only admins can list all the sellers");
+    }
+
     return sellerRepository.findAll().stream()
         .map(this.sellerMapper::mapSellerToResponse)
         .toList();
@@ -60,44 +82,53 @@ public class SellerServiceImpl implements SellerService {
 
   @Override
   @Transactional
-  public void deleteSeller(Long id, Long userId) {
+  public void deleteSeller(Long id) {
     Objects.requireNonNull(id, "Seller ID must not be null");
-    Objects.requireNonNull(userId, "User ID must not be null");
 
-    sellerRepository.findById(id).ifPresentOrElse(
-        seller -> {
-          if (!seller.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("Seller " + id + " does not belong to the authenticated user");
-          }
-          try {
-            sellerRepository.delete(seller);
-          } catch (Exception e) {
-            throw new RuntimeException("Failed to delete seller with ID: " + id, e);
-          }
-        },
-        () -> {
-          throw new RuntimeException("Seller not found with ID: " + id);
-        });
+    Seller seller = sellerRepository.findById(id)
+        .orElseThrow(() -> new SellerNotFoundException(id));
 
+    if (!authenticatedUser.isOwner(Role.SELLER, seller.getUser())) {
+      throw new AccessDeniedException("Seller " + id + " does not belong to the authenticated user");
+    }
+
+    try {
+      sellerRepository.delete(seller);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to delete seller with ID: " + id, e);
+    }
   }
 
   @Override
   public SellerResponseDto getSellerByUserId(Long userId) {
     Objects.requireNonNull(userId, "User ID must not be null");
 
-    return sellerRepository.findByUserId(userId)
-        .map(this.sellerMapper::mapSellerToResponse)
-        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + userId));
+    Seller seller = sellerRepository.findByUserId(userId)
+        .orElseThrow(() -> new SellerNotFoundException(userId));
+
+    if (!authenticatedUser.isOwner(Role.SELLER, seller.getUser())) {
+      throw new AccessDeniedException("Seller data can only be read by its own user");
+    }
+
+    return this.sellerMapper.mapSellerToResponse(seller);
   }
 
+  /**
+   * Updates the seller of the authenticated user. The target user is taken from
+   * the authenticated user, never from the request body.
+   */
   @Override
   @Transactional
-  public SellerResponseDto updateSeller(Long userId, SellerRequestDto sellerRequestDto) {
-    Objects.requireNonNull(userId, "User ID must not be null");
+  public SellerResponseDto updateSeller(SellerRequestDto sellerRequestDto) {
     Objects.requireNonNull(sellerRequestDto, "SellerRequestDto must not be null");
 
-    var updatedSeller = sellerRepository.findByUserId(userId)
-        .orElseThrow(() -> new RuntimeException("Seller not found for user ID: " + userId));
+    Long userId = authenticatedUser.get().getId();
+    Seller updatedSeller = sellerRepository.findByUserId(userId)
+        .orElseThrow(() -> new SellerNotFoundException(userId));
+
+    if (!authenticatedUser.isOwner(Role.SELLER, updatedSeller.getUser())) {
+      throw new AccessDeniedException("Only users with the SELLER role can update a seller");
+    }
 
     updatedSeller.setName(sellerRequestDto.name());
     updatedSeller.setEmail(sellerRequestDto.email());

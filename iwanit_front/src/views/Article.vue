@@ -73,6 +73,41 @@ async function fetchOffers() {
   }
 }
 
+const acceptingOfferId = ref(null)
+const acceptOfferError = ref('')
+
+async function acceptOffer(offer) {
+  acceptingOfferId.value = offer.id
+  acceptOfferError.value = ''
+
+  const body = {
+    offerId: offer.id,
+    articleId: Number(props.id),
+  }
+
+  try {
+    const res = await fetch(`${API}/v1/accepted-offers`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      acceptOfferError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    offer.accepted = true
+  } catch (e) {
+    acceptOfferError.value = 'No se pudo contactar la API'
+  } finally {
+    acceptingOfferId.value = null
+  }
+}
+
 const deletingOfferId = ref(null)
 const deleteOfferError = ref('')
 
@@ -336,18 +371,38 @@ async function submitOffer() {
                 <p class="text-base font-semibold text-slate-900">
                   {{ formatPrice(offer.price) }}
                 </p>
-                <button
-                  type="button"
-                  :disabled="deletingOfferId === offer.id"
-                  class="rounded-lg bg-white px-3 py-2 text-sm font-medium text-red-600
-                         border border-slate-200 transition hover:bg-red-50 disabled:opacity-50"
-                  @click="deleteOffer(offer)"
-                >
-                  {{ deletingOfferId === offer.id ? 'Eliminando...' : 'Eliminar' }}
-                </button>
+
+                <span v-if="offer.accepted" class="text-sm font-medium text-emerald-600">
+                  Aceptada
+                </span>
+
+                <template v-else>
+                  <button
+                    type="button"
+                    :disabled="acceptingOfferId === offer.id"
+                    class="rounded-lg bg-white px-3 py-2 text-sm font-medium text-emerald-600
+                           border border-slate-200 transition hover:bg-emerald-50 disabled:opacity-50"
+                    @click="acceptOffer(offer)"
+                  >
+                    {{ acceptingOfferId === offer.id ? 'Aceptando...' : 'Aceptar' }}
+                  </button>
+                  <button
+                    type="button"
+                    :disabled="deletingOfferId === offer.id"
+                    class="rounded-lg bg-white px-3 py-2 text-sm font-medium text-red-600
+                           border border-slate-200 transition hover:bg-red-50 disabled:opacity-50"
+                    @click="deleteOffer(offer)"
+                  >
+                    {{ deletingOfferId === offer.id ? 'Eliminando...' : 'Eliminar' }}
+                  </button>
+                </template>
               </div>
             </li>
           </ul>
+
+          <p v-if="acceptOfferError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ acceptOfferError }}
+          </p>
 
           <p v-if="deleteOfferError" class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
             {{ deleteOfferError }}

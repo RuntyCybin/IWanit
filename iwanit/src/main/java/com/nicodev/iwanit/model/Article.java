@@ -3,7 +3,11 @@ package com.nicodev.iwanit.model;
 import java.util.List;
 
 import jakarta.persistence.Column;
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +30,11 @@ public class Article {
   private String description;
   @Column(name = "price", nullable = false)
   private Double price;
+  // Default value fills the column for articles created before it existed
+  @Enumerated(EnumType.STRING)
+  @ColumnDefault("'AVAILABLE'")
+  @Column(name = "status", nullable = false)
+  private StatusArticle status;
 
   @ManyToOne
   @JoinColumn(name = "buyer_id", nullable = false)
@@ -42,6 +51,7 @@ public class Article {
     this.description = description;
     this.price = price;
     this.buyer = buyer;
+    this.status = StatusArticle.AVAILABLE;
   }
 
   public String getName() {
@@ -86,5 +96,13 @@ public class Article {
 
   public void setOffers(List<Offer> offers) {
     this.offers = offers;
+  }
+
+  public StatusArticle getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusArticle status) {
+    this.status = status;
   }
 }

@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 import com.nicodev.iwanit.service.BuyerService;
@@ -36,9 +34,8 @@ public class BuyerController {
    */
   @PostMapping
   public ResponseEntity<BuyerResponseDto> createBuyer(
-      @AuthenticationPrincipal User user,
       @RequestBody BuyerRequestDto buyerRequestDto) {
-    BuyerResponseDto createdBuyer = this.buyerService.createBuyer(user.getId(), buyerRequestDto);
+    BuyerResponseDto createdBuyer = this.buyerService.createBuyer(buyerRequestDto);
     return ResponseEntity
         .created(URI.create("/v1/buyers/" + createdBuyer.id()))
         .body(createdBuyer);
@@ -51,8 +48,8 @@ public class BuyerController {
    * @return
    */
   @GetMapping("/{id}")
-  public ResponseEntity<BuyerResponseDto> getBuyer(@AuthenticationPrincipal User user, @PathVariable Long id) {
-    return ResponseEntity.ok(this.buyerService.getBuyerById(id, user.getId()));
+  public ResponseEntity<BuyerResponseDto> getBuyer(@PathVariable Long id) {
+    return ResponseEntity.ok(this.buyerService.getBuyerById(id));
   }
 
   /**
@@ -61,8 +58,8 @@ public class BuyerController {
    * @return
    */
   @GetMapping
-  public ResponseEntity<List<BuyerResponseDto>> getAllBuyers(@AuthenticationPrincipal User user) {
-    return ResponseEntity.ok(this.buyerService.getAllBuyers(user));
+  public ResponseEntity<List<BuyerResponseDto>> getAllBuyers() {
+    return ResponseEntity.ok(this.buyerService.getAllBuyers());
   }
 
   /**
@@ -72,8 +69,8 @@ public class BuyerController {
    * @return
    */
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteBuyer(@AuthenticationPrincipal User user, @PathVariable Long id) {
-    this.buyerService.deleteBuyer(id, user.getId());
+  public ResponseEntity<Void> deleteBuyer(@PathVariable Long id) {
+    this.buyerService.deleteBuyer(id);
     return ResponseEntity.noContent().build();
   }
 
@@ -81,9 +78,8 @@ public class BuyerController {
    * Get a buyer by user ID
    */
   @GetMapping("/user/{userId}")
-  public ResponseEntity<BuyerResponseDto> getBuyerByUserId(@AuthenticationPrincipal User user,
-      @PathVariable Long userId) {
-    return ResponseEntity.ok(this.buyerService.getBuyerByUserId(userId, user.getId()));
+  public ResponseEntity<BuyerResponseDto> getBuyerByUserId(@PathVariable Long userId) {
+    return ResponseEntity.ok(this.buyerService.getBuyerByUserId(userId));
   }
 
   /**
@@ -92,9 +88,8 @@ public class BuyerController {
    */
   @PutMapping
   public ResponseEntity<BuyerResponseDto> updateBuyer(
-      @AuthenticationPrincipal User user,
       @RequestBody BuyerRequestDto buyerRequestDto) {
-    BuyerResponseDto updatedBuyer = this.buyerService.updateBuyer(user.getId(), buyerRequestDto);
+    BuyerResponseDto updatedBuyer = this.buyerService.updateBuyer(buyerRequestDto);
     return ResponseEntity.ok(updatedBuyer);
   }
 }

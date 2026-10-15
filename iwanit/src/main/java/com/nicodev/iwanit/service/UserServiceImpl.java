@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import com.nicodev.iwanit.exception.UserInvalidCredentialsException;
 import com.nicodev.iwanit.exception.UserNotFoundByNameException;
 import com.nicodev.iwanit.exception.UserNotFoundException;
 import com.nicodev.iwanit.exception.UserNotSavedException;
+import com.nicodev.iwanit.model.Role;
 import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.AuthRequestDto;
 import com.nicodev.iwanit.model.dto.AuthResponseDto;
@@ -23,6 +25,7 @@ import com.nicodev.iwanit.model.dto.RegisterRequestDto;
 import com.nicodev.iwanit.model.dto.UserResponseDto;
 import com.nicodev.iwanit.model.mapper.UserMapper;
 import com.nicodev.iwanit.repository.UserRepository;
+import com.nicodev.iwanit.security.AuthenticatedUser;
 import com.nicodev.iwanit.security.JwtService;
 
 import lombok.AllArgsConstructor;
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final JwtService jwtService;
   private final UserMapper userMapper;
+  private final AuthenticatedUser authenticatedUser;
 
   /**
    * (non-Javadoc)
@@ -101,11 +105,19 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new UserNotFoundException(id.toString()));
 
+    if (!isSelfOrAdmin(user)) {
+      throw new AccessDeniedException("Users can only read their own data");
+    }
+
     return this.userMapper.mapUserToUserResponseDto(user);
   }
 
   @Override
   public List<UserResponseDto> getAllUsers() {
+    if (!authenticatedUser.hasRole(Role.ADMIN)) {
+      throw new AccessDeniedException("Only admins can list all the users");
+    }
+
     return this.userRepository.findAll().stream()
         .map(userMapper::mapUserToUserResponseDto)
         .toList();
@@ -118,7 +130,15 @@ public class UserServiceImpl implements UserService {
     User user = this.userRepository.findByUsername(username)
         .orElseThrow(() -> new UserNotFoundByNameException(username));
 
+    if (!isSelfOrAdmin(user)) {
+      throw new AccessDeniedException("Users can only read their own data");
+    }
+
     return this.userMapper.mapUserToUserResponseDto(user);
+  }
+
+  private boolean isSelfOrAdmin(User user) {
+    return authenticatedUser.hasRole(Role.ADMIN) || authenticatedUser.get().getId().equals(user.getId());
   }
 
 }

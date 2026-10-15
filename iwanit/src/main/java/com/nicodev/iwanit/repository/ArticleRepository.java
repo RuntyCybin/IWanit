@@ -8,18 +8,21 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.nicodev.iwanit.model.Article;
-import com.nicodev.iwanit.model.Buyer;
+import com.nicodev.iwanit.model.StatusArticle;
+import com.nicodev.iwanit.model.StatusOffer;
 import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
     Optional<Article> findByName(String name);
 
-    Optional<Article> findByBuyer(Buyer buyer);
+    Optional<Article> findByIdAndStatus(Long id, StatusArticle status);
 
     // JOIN FETCH avoids N+1 when loading each article's buyer
-    @Query("SELECT a FROM Article a JOIN FETCH a.buyer b WHERE b.id = :buyerId")
-    List<Article> findAllByBuyerId(@Param("buyerId") Long buyerId);
+    @Query("SELECT a FROM Article a JOIN FETCH a.buyer b WHERE b.id = :buyerId AND a.status = :status")
+    List<Article> findAllByBuyerId(
+            @Param("buyerId") Long buyerId,
+            @Param("status") StatusArticle status);
 
     // LEFT JOIN FETCH avoids N+1 when loading an article's offers (article may have
     // none)
@@ -38,8 +41,10 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             SELECT new com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto(
                 a.id, a.name, a.description, a.price, a.buyer.id, COUNT(o))
             FROM Article a
-            LEFT JOIN a.offers o
+            LEFT JOIN a.offers o ON o.status = :offerStatus
             GROUP BY a.id, a.name, a.description, a.price, a.buyer.id
             """)
-    List<ArticleWithOffersCountDto> findAllByBuyerIdWithOffersCount();
+    List<ArticleWithOffersCountDto> findAllByBuyerIdWithOffersCount(@Param("offerStatus") StatusOffer offerStatus);
+
+    List<Article> findAllByStatus(StatusArticle status);
 }
