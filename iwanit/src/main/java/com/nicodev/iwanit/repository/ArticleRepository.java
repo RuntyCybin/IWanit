@@ -42,6 +42,7 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
                 a.id, a.name, a.description, a.price, a.buyer.id, COUNT(o))
             FROM Article a
             LEFT JOIN a.offers o ON o.status = :offerStatus
+            WHERE a.status = 'AVAILABLE'
             GROUP BY a.id, a.name, a.description, a.price, a.buyer.id
             """)
     List<ArticleWithOffersCountDto> findAllByBuyerIdWithOffersCount(@Param("offerStatus") StatusOffer offerStatus);
