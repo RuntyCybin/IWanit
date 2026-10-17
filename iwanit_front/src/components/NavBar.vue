@@ -1,11 +1,38 @@
 <script setup>
-import { logout, role, avatarUrl, email } from '../auth'
+import { computed } from 'vue'
+import {
+  logout,
+  role,
+  avatarUrl,
+  email,
+  country,
+  cp,
+  address,
+  iban,
+  paypal,
+} from '../auth'
 
 const links = [
   { name: 'home', label: 'Home' },
   { name: 'about', label: 'Sobre nosotros' },
   { name: 'contact', label: 'Contacto' },
 ]
+
+// El perfil esta incompleto si falta el email, o si faltan los campos
+// propios del rol (direccion de envio para buyer, cobro para seller).
+const profileIncomplete = computed(() => {
+  if (!email.value) return true
+
+  if (role.value === 'BUYER') {
+    return !country.value || !cp.value || !address.value
+  }
+
+  if (role.value === 'SELLER') {
+    return !iban.value || !paypal.value
+  }
+
+  return false
+})
 </script>
 
 <template>
@@ -76,7 +103,7 @@ const links = [
             </svg>
           </span>
 
-          <template v-if="!email">
+          <template v-if="profileIncomplete">
             <span
               class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-red-500
                      ring-2 ring-white"
