@@ -5,11 +5,21 @@ import {
   name as savedName,
   email as savedEmail,
   phoneNumber as savedPhoneNumber,
+  country as savedCountry,
+  cp as savedCp,
+  address as savedAddress,
+  iban as savedIban,
+  paypal as savedPaypal,
   role,
   token,
   setName,
   setEmail,
   setPhoneNumber,
+  setCountry,
+  setCp,
+  setAddress,
+  setIban,
+  setPaypal,
 } from '../auth'
 
 const API = '/api'
@@ -17,6 +27,11 @@ const API = '/api'
 const name = ref(savedName.value ?? '')
 const email = ref(savedEmail.value ?? '')
 const phoneNumber = ref(savedPhoneNumber.value ?? '')
+const country = ref(savedCountry.value ?? '')
+const cp = ref(savedCp.value ?? '')
+const address = ref(savedAddress.value ?? '')
+const iban = ref(savedIban.value ?? '')
+const paypal = ref(savedPaypal.value ?? '')
 const saved = ref(false)
 const error = ref('')
 const loading = ref(false)
@@ -42,11 +57,23 @@ async function submit() {
     return
   }
 
-  const body = {
-    name: name.value,
-    email: email.value,
-    phoneNumber: phoneNumber.value,
-  }
+  const body =
+    role.value === 'BUYER'
+      ? {
+          name: name.value,
+          email: email.value,
+          phoneNumber: phoneNumber.value,
+          country: country.value,
+          cp: cp.value,
+          address: address.value,
+        }
+      : {
+          name: name.value,
+          email: email.value,
+          phoneNumber: phoneNumber.value,
+          iban: iban.value,
+          paypal: paypal.value,
+        }
 
   try {
     const res = await fetch(API + path, {
@@ -66,6 +93,16 @@ async function submit() {
     setName(name.value)
     setEmail(email.value)
     setPhoneNumber(phoneNumber.value)
+
+    if (role.value === 'BUYER') {
+      setCountry(country.value)
+      setCp(cp.value)
+      setAddress(address.value)
+    } else {
+      setIban(iban.value)
+      setPaypal(paypal.value)
+    }
+
     saved.value = true
     hasExistingData.value = true
   } catch (e) {
@@ -79,6 +116,11 @@ function clear() {
   name.value = ''
   email.value = ''
   phoneNumber.value = ''
+  country.value = ''
+  cp.value = ''
+  address.value = ''
+  iban.value = ''
+  paypal.value = ''
   saved.value = false
   error.value = ''
 }
@@ -128,6 +170,60 @@ function clear() {
                      focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
             />
           </div>
+
+          <template v-if="role === 'BUYER'">
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Pais</label>
+              <input
+                v-model="country"
+                type="text"
+                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Codigo postal</label>
+              <input
+                v-model="cp"
+                type="text"
+                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Direccion</label>
+              <input
+                v-model="address"
+                type="text"
+                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="role === 'SELLER'">
+            <div>
+              <label class="block text-sm font-medium text-slate-700">IBAN</label>
+              <input
+                v-model="iban"
+                type="text"
+                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Paypal</label>
+              <input
+                v-model="paypal"
+                type="text"
+                class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+              />
+            </div>
+          </template>
 
           <div class="flex gap-2">
             <button
