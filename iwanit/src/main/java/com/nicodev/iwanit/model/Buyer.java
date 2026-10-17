@@ -26,6 +26,12 @@ public class Buyer {
   private String email;
   @Column(name = "phone_number_buyer", nullable = false)
   private String phoneNumber;
+  @Column(name = "address", nullable = false, unique = true)
+  private String address;
+  @Column(name = "cp", nullable = false)
+  private String cp;
+  @Column(name = "country", nullable = false)
+  private String country;
 
   @OneToOne
   @JoinColumn(name = "user_id", unique = true)
@@ -38,16 +44,22 @@ public class Buyer {
 
   }
 
-  public Buyer(String name, String email, String phoneNumber) {
+  public Buyer(String name, String email, String phoneNumber, String address, String cp, String country) {
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
+    this.address = address;
+    this.cp = cp;
+    this.country = country;
   }
 
-  public Buyer(String name, String email, String phoneNumber, User user) {
+  public Buyer(String name, String email, String phoneNumber, String address, String cp, String country, User user) {
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
+    this.address = address;
+    this.cp = cp;
+    this.country = country;
     this.user = user;
   }
 
@@ -97,5 +109,29 @@ public class Buyer {
 
   public void setArticles(List<Article> articles) {
     this.articles = articles;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
+  }
+
+  public String getCp() {
+    return cp;
+  }
+
+  public void setCp(String cp) {
+    this.cp = cp;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String country) {
+    this.country = country;
   }
 }

@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import NavBar from '../components/NavBar.vue'
+import { role, token, buyerId, sellerId } from '../auth'
 
 const props = defineProps({
   offerId: { type: String, required: true },
@@ -9,11 +10,53 @@ const props = defineProps({
 
 const router = useRouter()
 
+const API = '/api'
+
+const buyerEmail = ref('')
+const buyerPhoneNumber = ref('')
+const buyerAddress = ref('')
+const buyerCp = ref('')
+const buyerCountry = ref('')
+const buyerLoading = ref(false)
+const buyerError = ref('')
+
+async function fetchBuyer() {
+  if (!buyerId.value) return
+
+  buyerLoading.value = true
+  buyerError.value = ''
+
+  try {
+    const res = await fetch(`${API}/v1/buyers/${buyerId.value}`, {
+      headers: { Authorization: `Bearer ${token.value}` },
+    })
+
+    if (!res.ok) {
+      buyerError.value = `La API respondio ${res.status} ${res.statusText}`
+      return
+    }
+
+    const data = await res.json()
+    buyerEmail.value = data.email
+    buyerPhoneNumber.value = data.phoneNumber
+    buyerAddress.value = data.address
+    buyerCp.value = data.cp
+    buyerCountry.value = data.country
+  } catch (e) {
+    buyerError.value = 'No se pudo contactar la API'
+  } finally {
+    buyerLoading.value = false
+  }
+}
+
+onMounted(fetchBuyer)
+
 const paymentMethods = [
   { value: 'CARD', label: 'Tarjeta de credito/debito' },
   { value: 'TRANSFER', label: 'Transferencia bancaria' },
   { value: 'PAYPAL', label: 'PayPal' },
-  { value: 'CASH', label: 'Efectivo en la entrega' },
+  { value: 'APPLE_PAY', label: 'Apple Pay' },
+  { value: 'GOOGLE_PAY', label: 'Google Pay' },
 ]
 
 const shippingMethods = [
@@ -25,9 +68,11 @@ const shippingMethods = [
 const paymentMethod = ref('')
 const shippingMethod = ref('')
 
-function confirm() {
-  // Preliminar: todavia no hay endpoint para confirmar la compra.
-}
+// Preliminar: todavia no hay endpoint para confirmar la compra. La gestion
+// real del envio (etiqueta, recogida, tracking) quedara integrada mas
+// adelante con un agregador de transportistas a nivel UE (p. ej. Sendcloud
+// o Packlink PRO), en vez de contratar cada transportista por separado.
+function confirm() {}
 
 function cancel() {
   router.back()
@@ -46,6 +91,37 @@ function cancel() {
             Oferta #{{ offerId }} - elegi como quieres pagar y recibir tu articulo.
           </p>
         </header>
+
+        <div class="mb-4 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 class="text-sm font-medium text-slate-700">Tus datos de entrega</h2>
+
+          <p v-if="buyerError" class="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ buyerError }}
+          </p>
+
+          <dl v-else class="mt-2 space-y-1 text-sm text-slate-600">
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-500">Email</dt>
+              <dd>{{ buyerEmail || '-' }}</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-500">Telefono</dt>
+              <dd>{{ buyerPhoneNumber || '-' }}</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-500">Direccion</dt>
+              <dd>{{ buyerAddress || '-' }}</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-500">Codigo postal</dt>
+              <dd>{{ buyerCp || '-' }}</dd>
+            </div>
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-500">Pais</dt>
+              <dd>{{ buyerCountry || '-' }}</dd>
+            </div>
+          </dl>
+        </div>
 
         <form
           class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-5"
@@ -93,6 +169,10 @@ function cancel() {
                 {{ method.label }}
               </label>
             </div>
+            <p class="mt-2 text-xs text-slate-400">
+              La generacion de etiquetas y el seguimiento del envio se gestionaran mas
+              adelante a traves de un agregador de transportistas a nivel UE.
+            </p>
           </div>
 
           <div class="flex gap-2">

@@ -26,6 +26,10 @@ public class Seller {
   private String email;
   @Column(name = "phone_number_seller", nullable = false)
   private String phoneNumber;
+  @Column(name = "IBAN", nullable = true)
+  private String IBAN;
+  @Column(name = "PayPal", nullable = true)
+  private String PayPal;
 
   @OneToOne
   @JoinColumn(name = "user_id", unique = true)
@@ -38,16 +42,20 @@ public class Seller {
 
   }
 
-  public Seller(String name, String email, String phoneNumber) {
+  public Seller(String name, String email, String phoneNumber, String IBAN, String PayPal) {
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
+    this.IBAN = IBAN;
+    this.PayPal = PayPal;
   }
 
-  public Seller(String name, String email, String phoneNumber, User user) {
+  public Seller(String name, String email, String phoneNumber, String IBAN, String PayPal, User user) {
     this.name = name;
     this.email = email;
     this.phoneNumber = phoneNumber;
+    this.IBAN = IBAN;
+    this.PayPal = PayPal;
     this.user = user;
   }
 
@@ -93,5 +101,21 @@ public class Seller {
 
   public void setOffers(List<Offer> offers) {
     this.offers = offers;
+  }
+
+  public String getIBAN() {
+    return IBAN;
+  }
+
+  public void setIBAN(String IBAN) {
+    this.IBAN = IBAN;
+  }
+
+  public String getPayPal() {
+    return PayPal;
+  }
+
+  public void setPayPal(String payPal) {
+    PayPal = payPal;
   }
 }
