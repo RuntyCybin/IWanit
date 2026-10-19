@@ -26,7 +26,7 @@ public class Buyer {
   private String email;
   @Column(name = "phone_number_buyer", nullable = false)
   private String phoneNumber;
-  @Column(name = "address", nullable = false, unique = true)
+  @Column(name = "address", nullable = false)
   private String address;
   @Column(name = "cp", nullable = false)
   private String cp;
