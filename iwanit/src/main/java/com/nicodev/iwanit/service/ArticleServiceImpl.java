@@ -58,14 +58,10 @@ public class ArticleServiceImpl implements ArticleService {
       throw new AccessDeniedException("Articles can only be created as the authenticated buyer");
     }
 
-    try {
-      var article = articleMapper.mapToArticle(articleRequestDto, buyer);
+    var article = articleMapper.mapToArticle(articleRequestDto, buyer);
 
-      var savedArticle = articleRepository.save(article);
-      return articleMapper.toArticleResponseDto(savedArticle);
-    } catch (Exception e) {
-      throw new ArticleNotSavedException(e.getMessage());
-    }
+    var savedArticle = articleRepository.save(article);
+    return articleMapper.toArticleResponseDto(savedArticle);
   }
 
   @Override

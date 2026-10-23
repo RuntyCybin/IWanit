@@ -1,7 +1,23 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import NavBar from '../components/NavBar.vue'
-import { userId, role, token, buyerId, sellerId, setEmail, setName, setPhoneNumber, setBuyerId, setSellerId } from '../auth'
+import {
+  userId,
+  role,
+  token,
+  buyerId,
+  sellerId,
+  setEmail,
+  setName,
+  setPhoneNumber,
+  setBuyerId,
+  setSellerId,
+  setCountry,
+  setCp,
+  setAddress,
+  setIban,
+  setPaypal,
+} from '../auth'
 
 const API = '/api'
 
@@ -64,8 +80,13 @@ async function fetchUserProfile() {
 
     if (role.value === 'BUYER') {
       setBuyerId(data.id)
+      setCountry(data.country)
+      setCp(data.cp)
+      setAddress(data.address)
     } else if (role.value === 'SELLER') {
       setSellerId(data.id)
+      setIban(data.iban)
+      setPaypal(data.paypal)
     }
   } catch (e) {
     // sin conexion a la API: se mantienen los datos ya guardados en localStorage

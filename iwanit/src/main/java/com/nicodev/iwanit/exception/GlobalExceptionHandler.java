@@ -1,5 +1,9 @@
 package com.nicodev.iwanit.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -9,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+  Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   /**
    * Handles UserNotFoundByNameException and returns a 404 Not Found response.
@@ -300,6 +306,31 @@ public class GlobalExceptionHandler {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(ex.getMessage());
+  }
+
+  /**
+   * Handles DataIntegrityViolationException and returns a 409 Conflict response.
+   * Exception is thrown when a write violates a database constraint (unique,
+   * not null, foreign key...).
+   */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+    log.warn("Data integrity violation", ex);
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
+        .body("The request conflicts with existing data");
+  }
+
+  /**
+   * Handles any other DataAccessException and returns a 500 Internal Server
+   * Error response.
+   */
+  @ExceptionHandler(DataAccessException.class)
+  public ResponseEntity<String> handleDataAccessException(DataAccessException ex) {
+    log.error("Database error", ex);
+    return ResponseEntity
+        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body("Database error");
   }
 
 }

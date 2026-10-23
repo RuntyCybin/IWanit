@@ -1,5 +1,6 @@
 package com.nicodev.iwanit.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -41,7 +42,7 @@ public class Article {
   private Buyer buyer;
 
   @OneToMany(mappedBy = "article")
-  private List<Offer> offers;
+  private List<Offer> offers = new ArrayList<>();
 
   public Article() {
   }

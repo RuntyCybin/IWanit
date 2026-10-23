@@ -135,6 +135,9 @@ public class BuyerServiceImpl implements BuyerService {
     updatedBuyer.setName(buyerRequestDto.name());
     updatedBuyer.setEmail(buyerRequestDto.email());
     updatedBuyer.setPhoneNumber(buyerRequestDto.phoneNumber());
+    updatedBuyer.setAddress(buyerRequestDto.address());
+    updatedBuyer.setCountry(buyerRequestDto.country());
+    updatedBuyer.setCp(buyerRequestDto.cp());
 
     try {
       buyerRepository.save(updatedBuyer);

@@ -133,6 +133,8 @@ public class SellerServiceImpl implements SellerService {
     updatedSeller.setName(sellerRequestDto.name());
     updatedSeller.setEmail(sellerRequestDto.email());
     updatedSeller.setPhoneNumber(sellerRequestDto.phoneNumber());
+    updatedSeller.setIBAN(sellerRequestDto.IBAN());
+    updatedSeller.setPayPal(sellerRequestDto.PayPal());
 
     try {
       var savedSeller = sellerRepository.save(updatedSeller);
