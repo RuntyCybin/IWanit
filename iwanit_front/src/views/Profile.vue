@@ -71,8 +71,8 @@ async function submit() {
           name: name.value,
           email: email.value,
           phoneNumber: phoneNumber.value,
-          iban: iban.value,
-          paypal: paypal.value,
+          IBAN: iban.value,
+          PayPal: paypal.value,
         }
 
   try {
@@ -86,7 +86,8 @@ async function submit() {
     })
 
     if (!res.ok) {
-      error.value = `La API respondio ${res.status} ${res.statusText}`
+      const message = await res.text()
+      error.value = `${message}`
       return
     }
 

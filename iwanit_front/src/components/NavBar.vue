@@ -28,7 +28,7 @@ const profileIncomplete = computed(() => {
   }
 
   if (role.value === 'SELLER') {
-    return !iban.value || !paypal.value
+    return !iban.value && !paypal.value
   }
 
   return false

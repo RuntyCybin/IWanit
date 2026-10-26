@@ -136,6 +136,8 @@ public class SellerServiceImpl implements SellerService {
     updatedSeller.setIBAN(sellerRequestDto.IBAN());
     updatedSeller.setPayPal(sellerRequestDto.PayPal());
 
+    System.out.println("Updating seller: " + updatedSeller.getPayPal());
+
     try {
       var savedSeller = sellerRepository.save(updatedSeller);
       return this.sellerMapper.mapSellerToResponse(savedSeller);

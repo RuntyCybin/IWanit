@@ -85,8 +85,8 @@ async function fetchUserProfile() {
       setAddress(data.address)
     } else if (role.value === 'SELLER') {
       setSellerId(data.id)
-      setIban(data.iban)
-      setPaypal(data.paypal)
+      setIban(data.iban ?? data.IBAN)
+      setPaypal(data.payPal ?? data.PayPal)
     }
   } catch (e) {
     // sin conexion a la API: se mantienen los datos ya guardados en localStorage
