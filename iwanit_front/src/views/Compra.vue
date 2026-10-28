@@ -61,8 +61,8 @@ const paymentMethods = [
 
 const shippingMethods = [
   { value: 'HOME_DELIVERY', label: 'Envio a domicilio' },
-  { value: 'PICKUP_POINT', label: 'Recogida en punto de encuentro' },
-  { value: 'EXPRESS', label: 'Mensajeria urgente' },
+  //{ value: 'PICKUP_POINT', label: 'Recogida en punto de encuentro' },
+  //{ value: 'EXPRESS', label: 'Mensajeria urgente' },
 ]
 
 const paymentMethod = ref('')
