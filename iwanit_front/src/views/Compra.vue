@@ -52,8 +52,8 @@ async function fetchBuyer() {
 onMounted(fetchBuyer)
 
 const paymentMethods = [
-  { value: 'CARD', label: 'Tarjeta de credito/debito' },
-  { value: 'TRANSFER', label: 'Transferencia bancaria' },
+  { value: 'CREDIT_CARD', label: 'Tarjeta de credito/debito' },
+  { value: 'BANK_TRANSFER', label: 'Transferencia bancaria' },
   { value: 'PAYPAL', label: 'PayPal' },
   { value: 'APPLE_PAY', label: 'Apple Pay' },
   { value: 'GOOGLE_PAY', label: 'Google Pay' },
