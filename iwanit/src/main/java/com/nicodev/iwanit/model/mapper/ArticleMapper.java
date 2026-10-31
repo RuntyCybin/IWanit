@@ -61,7 +61,7 @@ public class ArticleMapper {
     return articleRequestDto != null &&
         articleRequestDto.title() != null && !articleRequestDto.title().trim().isEmpty() &&
         articleRequestDto.content() != null && !articleRequestDto.content().trim().isEmpty() &&
-        articleRequestDto.price() != null && articleRequestDto.price() > 0 &&
+        articleRequestDto.price() != null && articleRequestDto.price().signum() > 0 &&
         articleRequestDto.buyerId() != null && articleRequestDto.buyerId() > 0;
   }
 }

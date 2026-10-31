@@ -5,9 +5,7 @@ import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import com.nicodev.iwanit.exception.BuyerNotDeletedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
-import com.nicodev.iwanit.exception.BuyerNotSavedException;
 import com.nicodev.iwanit.exception.UserNotFoundException;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.Role;
@@ -48,13 +46,8 @@ public class BuyerServiceImpl implements BuyerService {
 
     var buyer = buyerMapper.mapBuyerRequestDtoToBuyer(buyerRequestDto, user);
 
-    try {
-      buyerRepository.save(buyer);
-
-      return buyerMapper.mapBuyerToResponseDto(buyer);
-    } catch (Exception e) {
-      throw new BuyerNotSavedException(buyerRequestDto.email(), e.getMessage());
-    }
+    buyerRepository.save(buyer);
+    return buyerMapper.mapBuyerToResponseDto(buyer);
   }
 
   @Override
@@ -94,11 +87,7 @@ public class BuyerServiceImpl implements BuyerService {
       throw new AccessDeniedException("Buyer " + id + " does not belong to the authenticated user");
     }
 
-    try {
-      buyerRepository.delete(buyer);
-    } catch (Exception e) {
-      throw new BuyerNotDeletedException(id, e.getMessage());
-    }
+    buyerRepository.delete(buyer);
   }
 
   @Override
@@ -139,11 +128,7 @@ public class BuyerServiceImpl implements BuyerService {
     updatedBuyer.setCountry(buyerRequestDto.country());
     updatedBuyer.setCp(buyerRequestDto.cp());
 
-    try {
-      buyerRepository.save(updatedBuyer);
-      return buyerMapper.mapBuyerToResponseDto(updatedBuyer);
-    } catch (Exception e) {
-      throw new BuyerNotSavedException(buyerRequestDto.email(), e.getMessage());
-    }
+    buyerRepository.save(updatedBuyer);
+    return buyerMapper.mapBuyerToResponseDto(updatedBuyer);
   }
 }

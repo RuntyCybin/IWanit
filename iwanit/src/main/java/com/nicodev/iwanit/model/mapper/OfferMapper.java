@@ -20,7 +20,7 @@ public class OfferMapper {
     Offer offer = new Offer();
     offer.setName(offerRequestDto.name());
     offer.setDescription(offerRequestDto.description());
-    offer.setPrice(offerRequestDto.price().doubleValue());
+    offer.setPrice(offerRequestDto.price());
     offer.setArticle(article);
     offer.setSeller(seller);
     return offer;

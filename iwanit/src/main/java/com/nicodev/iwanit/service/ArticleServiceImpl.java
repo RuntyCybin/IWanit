@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.ArticleAlreadyExistException;
 import com.nicodev.iwanit.exception.ArticleInvalidRequestException;
-import com.nicodev.iwanit.exception.ArticleNotDeletedException;
 import com.nicodev.iwanit.exception.ArticleNotFoundException;
-import com.nicodev.iwanit.exception.ArticleNotSavedException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
@@ -86,12 +84,8 @@ public class ArticleServiceImpl implements ArticleService {
     article.setDescription(articleRequestDto.content());
     article.setPrice(articleRequestDto.price());
 
-    try {
-      Article savedArticle = articleRepository.save(article);
-      return articleMapper.toArticleResponseDto(savedArticle);
-    } catch (Exception e) {
-      throw new ArticleNotSavedException(e.getMessage());
-    }
+    Article savedArticle = articleRepository.save(article);
+    return articleMapper.toArticleResponseDto(savedArticle);
   }
 
   @Override
@@ -106,11 +100,7 @@ public class ArticleServiceImpl implements ArticleService {
       throw new AccessDeniedException("Not allowed to delete this article");
     }
 
-    try {
-      articleRepository.deleteById(id);
-    } catch (Exception e) {
-      throw new ArticleNotDeletedException(id, e);
-    }
+    articleRepository.deleteById(id);
   }
 
   @Override

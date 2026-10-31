@@ -64,7 +64,7 @@ public class Payment {
     this.paymentMethod = paymentMethod;
     this.buyer = buyer;
     this.offer = offer;
-    this.amount = BigDecimal.valueOf(offer.getPrice());
+    this.amount = offer.getPrice();
     this.createdAt = LocalDateTime.now();
   }
 

@@ -62,14 +62,9 @@ public class OfferServiceImpl implements OfferService {
       throw new ArticleNotAvailableException(article.getId());
     }
 
-    try {
-      Offer offer = offerMapper.mapRequestDtoToOffer(offerRequestDto, article, seller);
-      offer = offerRepository.save(offer);
-      return offerMapper.mapOfferToResponseDto(offer);
-    } catch (Exception e) {
-      // TODO: Consider creating an OfferNotCreatedException exception
-      throw new RuntimeException("Failed to create offer: " + e.getMessage(), e);
-    }
+    Offer offer = offerMapper.mapRequestDtoToOffer(offerRequestDto, article, seller);
+    offer = offerRepository.save(offer);
+    return offerMapper.mapOfferToResponseDto(offer);
   }
 
   @Override
@@ -113,7 +108,7 @@ public class OfferServiceImpl implements OfferService {
 
     offer.setName(offerRequestDto.name());
     offer.setDescription(offerRequestDto.description());
-    offer.setPrice(offerRequestDto.price().doubleValue());
+    offer.setPrice(offerRequestDto.price());
     offer.setArticle(article);
     offer.setSeller(seller);
 

@@ -1,5 +1,6 @@
 package com.nicodev.iwanit.model.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record AcceptedOfferResponseDto(
@@ -7,7 +8,7 @@ public record AcceptedOfferResponseDto(
     Long offerId,
     Long articleId,
     Long sellerId,
-    Double price,
+    BigDecimal price,
     LocalDateTime acceptedAt) {
 
 }

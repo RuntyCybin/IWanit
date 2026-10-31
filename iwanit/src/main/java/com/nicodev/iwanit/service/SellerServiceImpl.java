@@ -47,12 +47,8 @@ public class SellerServiceImpl implements SellerService {
 
     var seller = this.sellerMapper.mapSellerRequestToSeller(sellerRequestDto, user);
 
-    try {
-      var savedSeller = sellerRepository.save(seller);
-      return this.sellerMapper.mapSellerToResponse(savedSeller);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to create seller", e);
-    }
+    var savedSeller = sellerRepository.save(seller);
+    return this.sellerMapper.mapSellerToResponse(savedSeller);
   }
 
   @Override
@@ -92,11 +88,7 @@ public class SellerServiceImpl implements SellerService {
       throw new AccessDeniedException("Seller " + id + " does not belong to the authenticated user");
     }
 
-    try {
-      sellerRepository.delete(seller);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to delete seller with ID: " + id, e);
-    }
+    sellerRepository.delete(seller);
   }
 
   @Override
@@ -138,12 +130,8 @@ public class SellerServiceImpl implements SellerService {
 
     System.out.println("Updating seller: " + updatedSeller.getPayPal());
 
-    try {
-      var savedSeller = sellerRepository.save(updatedSeller);
-      return this.sellerMapper.mapSellerToResponse(savedSeller);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to update seller for user ID: " + userId, e);
-    }
+    var savedSeller = sellerRepository.save(updatedSeller);
+    return this.sellerMapper.mapSellerToResponse(savedSeller);
   }
 
 }

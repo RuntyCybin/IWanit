@@ -1,5 +1,6 @@
 package com.nicodev.iwanit.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class Article {
   private String name;
   @Column(name = "description", nullable = false)
   private String description;
-  @Column(name = "price", nullable = false)
-  private Double price;
+  @Column(name = "price", nullable = false, precision = 10, scale = 2)
+  private BigDecimal price;
   // Default value fills the column for articles created before it existed
   @Enumerated(EnumType.STRING)
   @ColumnDefault("'AVAILABLE'")
@@ -47,7 +48,7 @@ public class Article {
   public Article() {
   }
 
-  public Article(String name, String description, Double price, Buyer buyer) {
+  public Article(String name, String description, BigDecimal price, Buyer buyer) {
     this.name = name;
     this.description = description;
     this.price = price;
@@ -71,11 +72,11 @@ public class Article {
     this.description = description;
   }
 
-  public Double getPrice() {
+  public BigDecimal getPrice() {
     return price;
   }
 
-  public void setPrice(Double price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 

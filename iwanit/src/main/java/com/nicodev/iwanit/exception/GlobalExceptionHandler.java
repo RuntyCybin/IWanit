@@ -74,36 +74,6 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles UserNotSavedException and returns a 500 Internal Server Error
-   * response.
-   * Exception is thrown when a user could not be saved to the database.
-   * 
-   * @param ex
-   * @return
-   */
-  @ExceptionHandler(UserNotSavedException.class)
-  public ResponseEntity<String> handleUserNotSavedException(UserNotSavedException ex) {
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(ex.getMessage());
-  }
-
-  /**
-   * Handles BuyerNotSavedException and returns a 500 Internal Server Error
-   * response.
-   * Exception is thrown when a buyer could not be saved to the database.
-   * 
-   * @param ex
-   * @return
-   */
-  @ExceptionHandler(BuyerNotSavedException.class)
-  public ResponseEntity<String> handleBuyerNotSavedException(BuyerNotSavedException ex) {
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(ex.getMessage());
-  }
-
-  /**
    * Handles ArticleInvalidRequestException and returns a 400 Bad Request
    * response.
    * Exception is thrown when an article request has invalid data.
@@ -119,21 +89,6 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles ArticleNotSavedException and returns a 500 Internal Server Error
-   * response.
-   * Exception is thrown when an article could not be saved to the database.
-   * 
-   * @param ex
-   * @return
-   */
-  @ExceptionHandler(ArticleNotSavedException.class)
-  public ResponseEntity<String> handleArticleNotSavedException(ArticleNotSavedException ex) {
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(ex.getMessage());
-  }
-
-  /**
    * Handles ArticleAlreadyExistException and returns a 409 Conflict response.
    * Exception is thrown when an article with the same title already exists.
    * 
@@ -144,21 +99,6 @@ public class GlobalExceptionHandler {
   public ResponseEntity<String> handleArticleAlreadyExistException(ArticleAlreadyExistException ex) {
     return ResponseEntity
         .status(HttpStatus.CONFLICT)
-        .body(ex.getMessage());
-  }
-
-  /**
-   * Handles ArticleNotDeletedException and returns a 500 Internal Server Error
-   * response.
-   * Exception is thrown when an article could not be deleted from the database.
-   * 
-   * @param ex
-   * @return
-   */
-  @ExceptionHandler(ArticleNotDeletedException.class)
-  public ResponseEntity<String> handleArticleNotDeletedException(ArticleNotDeletedException ex) {
-    return ResponseEntity
-        .status(HttpStatus.INTERNAL_SERVER_ERROR)
         .body(ex.getMessage());
   }
 
@@ -195,6 +135,36 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(OfferNotPendingException.class)
   public ResponseEntity<String> handleOfferNotPendingException(OfferNotPendingException ex) {
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
+        .body(ex.getMessage());
+  }
+
+  /**
+   * Handles OfferNotAcceptedException and returns a 409 Conflict response.
+   * Exception is thrown when a payment is created for an offer that was not
+   * accepted.
+   *
+   * @param ex
+   * @return
+   */
+  @ExceptionHandler(OfferNotAcceptedException.class)
+  public ResponseEntity<String> handleOfferNotAcceptedException(OfferNotAcceptedException ex) {
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
+        .body(ex.getMessage());
+  }
+
+  /**
+   * Handles PaymentAlreadyCompletedException and returns a 409 Conflict
+   * response. Exception is thrown when an offer that was already paid is paid
+   * again.
+   *
+   * @param ex
+   * @return
+   */
+  @ExceptionHandler(PaymentAlreadyCompletedException.class)
+  public ResponseEntity<String> handlePaymentAlreadyCompletedException(PaymentAlreadyCompletedException ex) {
     return ResponseEntity
         .status(HttpStatus.CONFLICT)
         .body(ex.getMessage());
@@ -282,6 +252,13 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(AcceptedOfferNotFoundException.class)
   public ResponseEntity<String> handleAcceptedOfferNotFoundException(AcceptedOfferNotFoundException ex) {
+    return ResponseEntity
+        .status(HttpStatus.NOT_FOUND)
+        .body(ex.getMessage());
+  }
+
+  @ExceptionHandler(PaymentNotFoundException.class)
+  public ResponseEntity<String> handlePaymentNotFoundException(PaymentNotFoundException ex) {
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
         .body(ex.getMessage());

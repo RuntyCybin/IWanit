@@ -16,7 +16,6 @@ import com.nicodev.iwanit.exception.UserAlreadyExistException;
 import com.nicodev.iwanit.exception.UserInvalidCredentialsException;
 import com.nicodev.iwanit.exception.UserNotFoundByNameException;
 import com.nicodev.iwanit.exception.UserNotFoundException;
-import com.nicodev.iwanit.exception.UserNotSavedException;
 import com.nicodev.iwanit.model.Role;
 import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.AuthRequestDto;
@@ -63,13 +62,9 @@ public class UserServiceImpl implements UserService {
         passwordEncoder.encode(registerRequestDto.password()),
         registerRequestDto.role());
 
-    try {
-      userRepository.save(user);
-      String token = jwtService.generateToken(user);
-      return new AuthResponseDto(token, registerRequestDto.role(), user.getId());
-    } catch (Exception e) {
-      throw new UserNotSavedException(registerRequestDto.username(), e.getMessage());
-    }
+    userRepository.save(user);
+    String token = jwtService.generateToken(user);
+    return new AuthResponseDto(token, registerRequestDto.role(), user.getId());
   }
 
   /**
