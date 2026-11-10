@@ -1,6 +1,6 @@
 <script setup>
 import { nextTick, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import NavBar from '../components/NavBar.vue'
 import { role, token, buyerId, sellerId } from '../auth'
 
@@ -8,7 +8,10 @@ const props = defineProps({
   offerId: { type: String, required: true },
 })
 
+const route = useRoute()
 const router = useRouter()
+
+const articleId = route.query.articleId
 
 const API = '/api'
 
@@ -52,8 +55,8 @@ async function fetchBuyer() {
 onMounted(fetchBuyer)
 
 const paymentMethods = [
-  { value: 'CREDIT_CARD', label: 'Tarjeta de credito/debito' },
-  { value: 'BANK_TRANSFER', label: 'Transferencia bancaria' },
+  //{ value: 'CREDIT_CARD', label: 'Tarjeta de credito/debito' },
+  //{ value: 'BANK_TRANSFER', label: 'Transferencia bancaria' },
   { value: 'PAYPAL', label: 'PayPal' },
   { value: 'APPLE_PAY', label: 'Apple Pay' },
   { value: 'GOOGLE_PAY', label: 'Google Pay' },
@@ -68,11 +71,61 @@ const shippingMethods = [
 const paymentMethod = ref('')
 const shippingMethod = ref('')
 
-// Preliminar: todavia no hay endpoint para confirmar la compra. La gestion
-// real del envio (etiqueta, recogida, tracking) quedara integrada mas
-// adelante con un agregador de transportistas a nivel UE (p. ej. Sendcloud
-// o Packlink PRO), en vez de contratar cada transportista por separado.
-function confirm() {}
+const confirmLoading = ref(false)
+const confirmError = ref('')
+
+// Mapea los valores locales del formulario al enum PaymentMethod del
+// backend. PAYPAL no entra aca: sigue su propio flujo con el boton del SDK.
+const PAYMENT_METHOD_MAP = {
+  CARD: 'CREDIT_CARD',
+  TRANSFER: 'BANK_TRANSFER',
+  APPLE_PAY: 'APPLE_PAY',
+  GOOGLE_PAY: 'GOOGLE_PAY',
+}
+
+// La gestion real del envio (etiqueta, recogida, tracking) quedara
+// integrada mas adelante con un agregador de transportistas a nivel UE
+// (p. ej. Sendcloud o Packlink PRO), en vez de contratar cada transportista
+// por separado.
+async function confirm() {
+  if (!buyerId.value) {
+    confirmError.value = 'No se encontro el buyer asociado a tu cuenta.'
+    return
+  }
+
+  confirmLoading.value = true
+  confirmError.value = ''
+
+  const body = {
+    buyerId: Number(buyerId.value),
+    offerId: Number(props.offerId),
+    paymentMethod: PAYMENT_METHOD_MAP[paymentMethod.value],
+  }
+
+  try {
+    const res = await fetch(`${API}/v1/payments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token.value}`,
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      const message = await res.text()
+      confirmError.value = `La API respondio ${res.status} ${message}`
+      return
+    }
+
+    await deleteArticle()
+    router.push({ name: 'home' })
+  } catch (e) {
+    confirmError.value = 'No se pudo contactar la API'
+  } finally {
+    confirmLoading.value = false
+  }
+}
 
 function cancel() {
   router.back()
@@ -128,14 +181,23 @@ async function createPaypalOrder() {
 // Placeholder: todavia no existe el endpoint que capture el pago aprobado
 // en el backend.
 async function capturePaypalOrder(orderId) {
-  await fetch(`${API}/v1/payments/paypal/capture-order`, {
+  const res = await fetch(`${API}/v1/payments/paypal/capture-order`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token.value}`,
     },
-    body: JSON.stringify({ orderId, offerId: Number(props.offerId) }),
+    body: JSON.stringify({
+      orderId,
+      offerId: Number(props.offerId),
+      shippingMethod: shippingMethod.value,
+    }),
   })
+
+  if (res.ok) {
+    await deleteArticle()
+    router.push({ name: 'home' })
+  }
 }
 
 watch(paymentMethod, async (value) => {
@@ -273,10 +335,11 @@ watch(paymentMethod, async (value) => {
             <button
               v-if="paymentMethod !== 'PAYPAL'"
               type="submit"
+              :disabled="confirmLoading"
               class="flex-1 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white
-                     transition hover:bg-slate-800"
+                     transition hover:bg-slate-800 disabled:opacity-50"
             >
-              Confirmar compra
+              {{ confirmLoading ? 'Confirmando...' : 'Confirmar compra' }}
             </button>
             <button
               type="button"
@@ -287,6 +350,10 @@ watch(paymentMethod, async (value) => {
               Cancelar
             </button>
           </div>
+
+          <p v-if="confirmError" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ confirmError }}
+          </p>
         </form>
       </div>
     </main>
