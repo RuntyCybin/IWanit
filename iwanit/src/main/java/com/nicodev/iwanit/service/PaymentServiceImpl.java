@@ -7,7 +7,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
-import com.nicodev.iwanit.exception.OfferNotAcceptedException;
 import com.nicodev.iwanit.exception.OfferNotFoundException;
 import com.nicodev.iwanit.exception.PaymentAlreadyCompletedException;
 import com.nicodev.iwanit.exception.PaymentNotFoundException;
@@ -60,7 +59,8 @@ public class PaymentServiceImpl implements PaymentService {
       throw new AccessDeniedException("Only the article's buyer can pay its offers");
     }
     if (offer.getStatus() != StatusOffer.ACCEPTED) {
-      throw new OfferNotAcceptedException(offer.getId());
+      offer.setStatus(StatusOffer.ACCEPTED);
+      offerRepository.save(offer);
     }
     if (paymentRepository.existsByOfferIdAndStatus(offer.getId(), StatusPayment.COMPLETED)) {
       throw new PaymentAlreadyCompletedException(offer.getId());
