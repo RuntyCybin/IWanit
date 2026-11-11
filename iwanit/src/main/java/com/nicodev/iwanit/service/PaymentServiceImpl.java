@@ -6,19 +6,23 @@ import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.nicodev.iwanit.exception.ArticleNotAvailableException;
 import com.nicodev.iwanit.exception.BuyerNotFoundException;
 import com.nicodev.iwanit.exception.OfferNotFoundException;
 import com.nicodev.iwanit.exception.PaymentAlreadyCompletedException;
 import com.nicodev.iwanit.exception.PaymentNotFoundException;
+import com.nicodev.iwanit.model.Article;
 import com.nicodev.iwanit.model.Buyer;
 import com.nicodev.iwanit.model.Offer;
 import com.nicodev.iwanit.model.Payment;
 import com.nicodev.iwanit.model.Role;
+import com.nicodev.iwanit.model.StatusArticle;
 import com.nicodev.iwanit.model.StatusOffer;
 import com.nicodev.iwanit.model.StatusPayment;
 import com.nicodev.iwanit.model.dto.PaymentRequestDto;
 import com.nicodev.iwanit.model.dto.PaymentResponseDto;
 import com.nicodev.iwanit.model.mapper.PaymentMapper;
+import com.nicodev.iwanit.repository.ArticleRepository;
 import com.nicodev.iwanit.repository.BuyerRepository;
 import com.nicodev.iwanit.repository.OfferRepository;
 import com.nicodev.iwanit.repository.PaymentRepository;
@@ -36,6 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
   private final OfferRepository offerRepository;
   private final PaymentMapper paymentMapper;
   private final AuthenticatedUser authenticatedUser;
+  private final ArticleRepository articleRepository;
 
   /**
    * The buyer of an article pays the offer they accepted for it.
@@ -55,15 +60,27 @@ public class PaymentServiceImpl implements PaymentService {
     if (!authenticatedUser.isOwner(Role.BUYER, buyer.getUser())) {
       throw new AccessDeniedException("Buyers can only create their own payments");
     }
-    if (!offer.getArticle().getBuyer().getId().equals(buyer.getId())) {
+    Article article = offer.getArticle();
+    if (!article.getBuyer().getId().equals(buyer.getId())) {
       throw new AccessDeniedException("Only the article's buyer can pay its offers");
-    }
-    if (offer.getStatus() != StatusOffer.ACCEPTED) {
-      offer.setStatus(StatusOffer.ACCEPTED);
-      offerRepository.save(offer);
     }
     if (paymentRepository.existsByOfferIdAndStatus(offer.getId(), StatusPayment.COMPLETED)) {
       throw new PaymentAlreadyCompletedException(offer.getId());
+    }
+    // A bought article can only receive retries for the offer that was paid
+    if (article.getStatus() == StatusArticle.BOUGHT && offer.getStatus() != StatusOffer.ACCEPTED) {
+      throw new ArticleNotAvailableException(article.getId());
+    }
+
+    // The article is kept as BOUGHT instead of deleted, payments reference its offers
+    if (article.getStatus() != StatusArticle.BOUGHT) {
+      article.getOffers().stream()
+          .filter(other -> !other.getId().equals(offer.getId()))
+          .forEach(other -> other.setStatus(StatusOffer.REJECTED));
+      offer.setStatus(StatusOffer.ACCEPTED);
+      article.setStatus(StatusArticle.BOUGHT);
+      offerRepository.saveAll(article.getOffers());
+      articleRepository.save(article);
     }
 
     Payment payment = paymentRepository.save(new Payment(paymentRequestDto.paymentMethod(), buyer, offer));

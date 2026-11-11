@@ -117,8 +117,6 @@ async function confirm() {
       confirmError.value = `La API respondio ${res.status} ${message}`
       return
     }
-
-    await deleteArticle()
     router.push({ name: 'home' })
   } catch (e) {
     confirmError.value = 'No se pudo contactar la API'
@@ -195,7 +193,6 @@ async function capturePaypalOrder(orderId) {
   })
 
   if (res.ok) {
-    await deleteArticle()
     router.push({ name: 'home' })
   }
 }
