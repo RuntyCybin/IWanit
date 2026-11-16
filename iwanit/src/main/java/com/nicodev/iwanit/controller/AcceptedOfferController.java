@@ -1,6 +1,7 @@
 package com.nicodev.iwanit.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,4 +39,10 @@ public class AcceptedOfferController {
   public ResponseEntity<AcceptedOfferResponseDto> getAcceptedOffer(@PathVariable Long id) {
     return ResponseEntity.ok(this.acceptedOfferService.getAcceptedOffer(id));
   }
+
+  @GetMapping("/buyer/{buyerId}")
+  public ResponseEntity<List<AcceptedOfferResponseDto>> getAcceptedOfferByBuyer(@PathVariable Long buyerId) {
+    return ResponseEntity.ok(this.acceptedOfferService.getAcceptedOfferByBuyer(buyerId));
+  }
+
 }

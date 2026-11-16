@@ -21,6 +21,7 @@ import com.nicodev.iwanit.model.dto.ArticleWithOffersCountDto;
 import com.nicodev.iwanit.model.mapper.ArticleMapper;
 import com.nicodev.iwanit.repository.ArticleRepository;
 import com.nicodev.iwanit.repository.BuyerRepository;
+import com.nicodev.iwanit.repository.OfferRepository;
 import com.nicodev.iwanit.security.AuthenticatedUser;
 
 import jakarta.transaction.Transactional;
@@ -32,6 +33,7 @@ public class ArticleServiceImpl implements ArticleService {
 
   private final ArticleRepository articleRepository;
   private final BuyerRepository buyerRepository;
+  private final OfferRepository offerRepository;
   private final ArticleMapper articleMapper;
   private final AuthenticatedUser authenticatedUser;
 
@@ -98,6 +100,11 @@ public class ArticleServiceImpl implements ArticleService {
 
     if (!authenticatedUser.isOwner(Role.BUYER, article.getBuyer().getUser())) {
       throw new AccessDeniedException("Not allowed to delete this article");
+    }
+
+    // Offers reference the article, so they have to be deleted first
+    if (!article.getOffers().isEmpty()) {
+      offerRepository.deleteAll(article.getOffers());
     }
 
     articleRepository.deleteById(id);

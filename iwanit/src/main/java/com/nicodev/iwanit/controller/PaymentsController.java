@@ -33,11 +33,23 @@ public class PaymentsController {
     return ResponseEntity.created(URI.create("/v1/payments/" + createdPayment.id())).body(createdPayment);
   }
 
+  /***
+   * Get a payment by its ID
+   * 
+   * @param paymentId
+   * @return
+   */
   @GetMapping("/{paymentId}")
   public ResponseEntity<PaymentResponseDto> getPaymentById(@PathVariable Long paymentId) {
     return ResponseEntity.ok(this.paymentService.getPaymentById(paymentId));
   }
 
+  /***
+   * Get all payments made by a buyer
+   * 
+   * @param buyerId
+   * @return
+   */
   @GetMapping("/buyer/{buyerId}")
   public ResponseEntity<List<PaymentResponseDto>> getAllBuyerPayments(@PathVariable Long buyerId) {
     return ResponseEntity.ok(this.paymentService.getAllBuyerPayments(buyerId));

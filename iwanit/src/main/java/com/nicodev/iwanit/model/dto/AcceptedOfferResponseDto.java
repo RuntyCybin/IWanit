@@ -7,6 +7,7 @@ public record AcceptedOfferResponseDto(
     Long id,
     Long offerId,
     Long articleId,
+    String articleName,
     Long sellerId,
     BigDecimal price,
     LocalDateTime acceptedAt) {

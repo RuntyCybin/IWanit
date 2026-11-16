@@ -9,6 +9,7 @@ import Article from '../views/Article.vue'
 import BuyerArticles from '../views/BuyerArticles.vue'
 import SellerOffers from '../views/SellerOffers.vue'
 import Compra from '../views/Compra.vue'
+import AcceptedOffers from '../views/AcceptedOffers.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -23,6 +24,7 @@ const router = createRouter({
     { path: '/my-offers', name: 'seller-offers', component: SellerOffers },
     { path: '/articles/:id', name: 'article', component: Article, props: true },
     { path: '/compra/:offerId', name: 'compra', component: Compra, props: true },
+    { path: '/accepted-offers', name: 'accepted-offers', component: AcceptedOffers },
   ],
 })
 

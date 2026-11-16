@@ -63,6 +63,16 @@ const profileIncomplete = computed(() => {
         </router-link>
 
         <router-link
+          v-if="role === 'BUYER'"
+          :to="{ name: 'accepted-offers' }"
+          class="rounded-lg px-3 py-2 text-sm font-medium transition"
+          active-class="bg-slate-900 text-white"
+          exact-active-class="bg-slate-900 text-white"
+        >
+          Ofertas aceptadas
+        </router-link>
+
+        <router-link
           v-else-if="role === 'SELLER'"
           :to="{ name: 'seller-offers' }"
           class="rounded-lg px-3 py-2 text-sm font-medium transition"
