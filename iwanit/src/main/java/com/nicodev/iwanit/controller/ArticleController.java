@@ -38,8 +38,6 @@ public class ArticleController {
   /**
    * Gets all the articles
    * Called on the Home page to display all the articles
-   * 
-   * @return
    */
   @GetMapping
   public ResponseEntity<List<ArticleResponseDto>> getAllArticles() {
@@ -53,9 +51,6 @@ public class ArticleController {
 
   /**
    * Gets all the articles of a buyer
-   * 
-   * @param buyerId
-   * @return
    */
   @GetMapping("/buyer/{buyerId}")
   public ResponseEntity<List<ArticleResponseDto>> getAllBuyerArticles(@PathVariable Long buyerId) {
@@ -64,9 +59,6 @@ public class ArticleController {
 
   /**
    * Gets all the articles of a buyer with the number of offers of each one
-   *
-   * @param buyerId
-   * @return
    */
   @GetMapping("/offers-count")
   public ResponseEntity<List<ArticleWithOffersCountDto>> getAllBuyerArticlesWithOffersCount() {

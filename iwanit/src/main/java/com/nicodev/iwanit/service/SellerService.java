@@ -7,15 +7,15 @@ import com.nicodev.iwanit.model.dto.SellerResponseDto;
 
 public interface SellerService {
 
-  SellerResponseDto createSeller(Long userId, SellerRequestDto sellerRequestDto);
+  SellerResponseDto createSeller(SellerRequestDto sellerRequestDto);
 
   SellerResponseDto getSellerById(Long id);
 
   List<SellerResponseDto> getAllSellers();
 
-  void deleteSeller(Long id, Long userId);
+  void deleteSeller(Long id);
 
   SellerResponseDto getSellerByUserId(Long userId);
 
-  SellerResponseDto updateSeller(Long userId, SellerRequestDto sellerRequestDto);
+  SellerResponseDto updateSeller(SellerRequestDto sellerRequestDto);
 }

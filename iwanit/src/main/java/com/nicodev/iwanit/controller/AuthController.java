@@ -22,9 +22,6 @@ public class AuthController {
 
   /**
    * Registers a new user with the provided registration details.
-   * 
-   * @param registerRequestDto
-   * @return
    */
   @PostMapping("/register")
   public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterRequestDto registerRequestDto) {
@@ -33,9 +30,6 @@ public class AuthController {
 
   /**
    * Authenticates a user with the provided login credentials.
-   * 
-   * @param authRequestDto
-   * @return
    */
   @PostMapping("/login")
   public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto authRequestDto) {

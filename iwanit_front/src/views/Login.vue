@@ -36,7 +36,8 @@ async function submit() {
     })
 
     if (!res.ok) {
-      error.value = `La API respondio ${res.status} ${res.statusText}`
+      const message = await res.text()
+      error.value = `La API respondio ${res.status} ${message}`
       return
     }
 

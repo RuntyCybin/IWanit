@@ -23,6 +23,9 @@ public class BuyerMapper {
         buyerRequestDto.name(),
         buyerRequestDto.email(),
         buyerRequestDto.phoneNumber(),
+        buyerRequestDto.address(),
+        buyerRequestDto.cp(),
+        buyerRequestDto.country(),
         user);
   }
 
@@ -37,7 +40,10 @@ public class BuyerMapper {
         buyer.getEmail(),
         buyer.getPhoneNumber(),
         buyer.getUser().getId(),
-        articles);
+        articles,
+        buyer.getAddress(),
+        buyer.getCp(),
+        buyer.getCountry());
   }
 
 }

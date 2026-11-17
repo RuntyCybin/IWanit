@@ -2,21 +2,20 @@ package com.nicodev.iwanit.service;
 
 import java.util.List;
 
-import com.nicodev.iwanit.model.User;
 import com.nicodev.iwanit.model.dto.BuyerRequestDto;
 import com.nicodev.iwanit.model.dto.BuyerResponseDto;
 
 public interface BuyerService {
 
-  BuyerResponseDto createBuyer(Long userId, BuyerRequestDto buyerRequestDto);
+  BuyerResponseDto createBuyer(BuyerRequestDto buyerRequestDto);
 
-  List<BuyerResponseDto> getAllBuyers(User caller);
+  List<BuyerResponseDto> getAllBuyers();
 
-  BuyerResponseDto getBuyerById(Long id, Long userId);
+  BuyerResponseDto getBuyerById(Long id);
 
-  void deleteBuyer(Long id, Long userId);
+  void deleteBuyer(Long id);
 
-  BuyerResponseDto getBuyerByUserId(Long userId, Long authenticatedUserId);
+  BuyerResponseDto getBuyerByUserId(Long userId);
 
-  BuyerResponseDto updateBuyer(Long userId, BuyerRequestDto buyerRequestDto);
+  BuyerResponseDto updateBuyer(BuyerRequestDto buyerRequestDto);
 }

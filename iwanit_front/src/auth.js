@@ -10,6 +10,11 @@ export const name = ref(localStorage.getItem('name'))
 export const phoneNumber = ref(localStorage.getItem('phoneNumber'))
 export const buyerId = ref(localStorage.getItem('buyerId'))
 export const sellerId = ref(localStorage.getItem('sellerId'))
+export const country = ref(localStorage.getItem('country'))
+export const cp = ref(localStorage.getItem('cp'))
+export const address = ref(localStorage.getItem('address'))
+export const iban = ref(localStorage.getItem('iban'))
+export const paypal = ref(localStorage.getItem('paypal'))
 
 export function setToken(value) {
   token.value = value
@@ -56,6 +61,31 @@ export function setSellerId(value) {
   localStorage.setItem('sellerId', value)
 }
 
+export function setCountry(value) {
+  country.value = value
+  localStorage.setItem('country', value)
+}
+
+export function setCp(value) {
+  cp.value = value
+  localStorage.setItem('cp', value)
+}
+
+export function setAddress(value) {
+  address.value = value
+  localStorage.setItem('address', value)
+}
+
+export function setIban(value) {
+  iban.value = value
+  localStorage.setItem('iban', value)
+}
+
+export function setPaypal(value) {
+  paypal.value = value
+  localStorage.setItem('paypal', value)
+}
+
 export function logout() {
   token.value = null
   userId.value = null
@@ -66,6 +96,11 @@ export function logout() {
   phoneNumber.value = null
   buyerId.value = null
   sellerId.value = null
+  country.value = null
+  cp.value = null
+  address.value = null
+  iban.value = null
+  paypal.value = null
   localStorage.removeItem('token')
   localStorage.removeItem('userId')
   localStorage.removeItem('role')
@@ -75,6 +110,11 @@ export function logout() {
   localStorage.removeItem('phoneNumber')
   localStorage.removeItem('buyerId')
   localStorage.removeItem('sellerId')
+  localStorage.removeItem('country')
+  localStorage.removeItem('cp')
+  localStorage.removeItem('address')
+  localStorage.removeItem('iban')
+  localStorage.removeItem('paypal')
   router.push({ name: 'login' })
 }
 
@@ -92,6 +132,11 @@ window.addEventListener('storage', (event) => {
     phoneNumber.value = null
     buyerId.value = null
     sellerId.value = null
+    country.value = null
+    cp.value = null
+    address.value = null
+    iban.value = null
+    paypal.value = null
     router.push({ name: 'login' })
   }
 })

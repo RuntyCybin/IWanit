@@ -1,7 +1,13 @@
 package com.nicodev.iwanit.model;
 
+import java.math.BigDecimal;
+
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,8 +27,13 @@ public class Offer {
   private String name;
   @Column(name = "description", nullable = false)
   private String description;
-  @Column(name = "price", nullable = false)
-  private Double price;
+  @Column(name = "price", nullable = false, precision = 10, scale = 2)
+  private BigDecimal price;
+  // Default value fills the column for offers created before it existed
+  @Enumerated(EnumType.STRING)
+  @ColumnDefault("'PENDING'")
+  @Column(name = "status", nullable = false)
+  private StatusOffer status = StatusOffer.PENDING;
 
   @ManyToOne
   @JoinColumn(name = "article_id", nullable = false)
@@ -35,7 +46,7 @@ public class Offer {
   public Offer() {
   }
 
-  public Offer(Long id, String name, String description, Double price) {
+  public Offer(Long id, String name, String description, BigDecimal price) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -66,11 +77,11 @@ public class Offer {
     this.description = description;
   }
 
-  public Double getPrice() {
+  public BigDecimal getPrice() {
     return price;
   }
 
-  public void setPrice(Double price) {
+  public void setPrice(BigDecimal price) {
     this.price = price;
   }
 
@@ -88,5 +99,13 @@ public class Offer {
 
   public void setArticle(Article article) {
     this.article = article;
+  }
+
+  public StatusOffer getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusOffer status) {
+    this.status = status;
   }
 }
