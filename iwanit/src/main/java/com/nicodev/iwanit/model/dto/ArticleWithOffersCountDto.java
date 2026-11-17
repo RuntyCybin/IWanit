@@ -1,5 +1,7 @@
 package com.nicodev.iwanit.model.dto;
 
-public record ArticleWithOffersCountDto(Long id, String name, String description, Double price, Long buyerId,
+import java.math.BigDecimal;
+
+public record ArticleWithOffersCountDto(Long id, String name, String description, BigDecimal price, Long buyerId,
     Long offersCount) {
 }

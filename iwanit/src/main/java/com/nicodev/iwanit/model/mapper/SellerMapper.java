@@ -19,7 +19,12 @@ public class SellerMapper {
   private final OfferMapper offerMapper;
 
   public Seller mapSellerRequestToSeller(SellerRequestDto requestDto, User user) {
-    return new Seller(requestDto.name(), requestDto.email(), requestDto.phoneNumber(), user);
+    return new Seller(
+        requestDto.name(),
+        requestDto.email(),
+        requestDto.phoneNumber(),
+        requestDto.IBAN(),
+        requestDto.PayPal(), user);
   }
 
   public SellerResponseDto mapSellerToResponse(Seller seller) {
@@ -32,6 +37,8 @@ public class SellerMapper {
         seller.getName(),
         seller.getEmail(),
         seller.getPhoneNumber(),
+        seller.getIBAN(),
+        seller.getPayPal(),
         seller.getUser().getId(),
         offers);
   }
