@@ -12,4 +12,6 @@ public interface PaymentService {
 
   List<PaymentResponseDto> getAllBuyerPayments(Long buyerId);
 
+  void handleStripeWebhook(String payload, String signature);
+
 }

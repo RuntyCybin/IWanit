@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,26 +34,31 @@ public class PaymentsController {
     return ResponseEntity.created(URI.create("/v1/payments/" + createdPayment.id())).body(createdPayment);
   }
 
-  /***
+  /**
    * Get a payment by its ID
-   * 
-   * @param paymentId
-   * @return
    */
   @GetMapping("/{paymentId}")
   public ResponseEntity<PaymentResponseDto> getPaymentById(@PathVariable Long paymentId) {
     return ResponseEntity.ok(this.paymentService.getPaymentById(paymentId));
   }
 
-  /***
+  /**
    * Get all payments made by a buyer
-   * 
-   * @param buyerId
-   * @return
    */
   @GetMapping("/buyer/{buyerId}")
   public ResponseEntity<List<PaymentResponseDto>> getAllBuyerPayments(@PathVariable Long buyerId) {
     return ResponseEntity.ok(this.paymentService.getAllBuyerPayments(buyerId));
+  }
+
+  /**
+   * Stripe webhook endpoint to receive payment status updates from the payment
+   * gateway.
+   */
+  @PostMapping("/webhook")
+  public ResponseEntity<Void> handleStripeWebhook(@RequestBody String payload,
+      @RequestHeader("Stripe-Signature") String signature) {
+    this.paymentService.handleStripeWebhook(payload, signature);
+    return ResponseEntity.ok().build();
   }
 
 }

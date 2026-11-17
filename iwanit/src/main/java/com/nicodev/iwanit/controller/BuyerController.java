@@ -43,9 +43,6 @@ public class BuyerController {
 
   /**
    * Gets a buyer by its ID
-   * 
-   * @param id
-   * @return
    */
   @GetMapping("/{id}")
   public ResponseEntity<BuyerResponseDto> getBuyer(@PathVariable Long id) {
@@ -54,8 +51,6 @@ public class BuyerController {
 
   /**
    * Gets all the buyers
-   * 
-   * @return
    */
   @GetMapping
   public ResponseEntity<List<BuyerResponseDto>> getAllBuyers() {
@@ -64,9 +59,6 @@ public class BuyerController {
 
   /**
    * Deletes a buyer
-   * 
-   * @param id
-   * @return
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteBuyer(@PathVariable Long id) {

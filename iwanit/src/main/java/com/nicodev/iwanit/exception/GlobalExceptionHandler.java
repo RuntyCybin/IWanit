@@ -19,9 +19,6 @@ public class GlobalExceptionHandler {
   /**
    * Handles UserNotFoundByNameException and returns a 404 Not Found response.
    * Exception is thrown when a user is not found by their username.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(UserNotFoundByNameException.class)
   public ResponseEntity<String> handleUserNotFoundByNameException(UserNotFoundByNameException ex) {
@@ -33,9 +30,6 @@ public class GlobalExceptionHandler {
   /**
    * Handles UserNotFoundByEmailException and returns a 404 Not Found response.
    * Exception is thrown when a user is not found by their email.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<String> handleUserNotFoundByEmailException(UserNotFoundException ex) {
@@ -48,9 +42,6 @@ public class GlobalExceptionHandler {
    * Handles UserInvalidCredentialsException and returns a 401 Unauthorized
    * response.
    * Exception is thrown when a user provides invalid credentials during login.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(UserInvalidCredentialsException.class)
   public ResponseEntity<String> handleUserInvalidCredentialsException(UserInvalidCredentialsException ex) {
@@ -62,9 +53,6 @@ public class GlobalExceptionHandler {
   /**
    * Handles UserAlreadyExistException and returns a 409 Conflict response.
    * Exception is thrown when a user tries to register with an existing username.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(UserAlreadyExistException.class)
   public ResponseEntity<String> handleUserAlreadyExistException(UserAlreadyExistException ex) {
@@ -77,9 +65,6 @@ public class GlobalExceptionHandler {
    * Handles ArticleInvalidRequestException and returns a 400 Bad Request
    * response.
    * Exception is thrown when an article request has invalid data.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(ArticleInvalidRequestException.class)
   public ResponseEntity<String> handleArticleInvalidRequestException(ArticleInvalidRequestException ex) {
@@ -91,9 +76,6 @@ public class GlobalExceptionHandler {
   /**
    * Handles ArticleAlreadyExistException and returns a 409 Conflict response.
    * Exception is thrown when an article with the same title already exists.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(ArticleAlreadyExistException.class)
   public ResponseEntity<String> handleArticleAlreadyExistException(ArticleAlreadyExistException ex) {
@@ -107,9 +89,6 @@ public class GlobalExceptionHandler {
    * response.
    * Exception is thrown when the buyer tries to accept an offer on an article
    * that already has an accepted offer.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(AcceptedOfferAlreadyExistException.class)
   public ResponseEntity<String> handleAcceptedOfferAlreadyExistException(AcceptedOfferAlreadyExistException ex) {
@@ -129,9 +108,6 @@ public class GlobalExceptionHandler {
    * Handles OfferNotPendingException and returns a 409 Conflict response.
    * Exception is thrown when an offer that was already accepted or rejected is
    * accepted, modified or deleted.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(OfferNotPendingException.class)
   public ResponseEntity<String> handleOfferNotPendingException(OfferNotPendingException ex) {
@@ -144,9 +120,6 @@ public class GlobalExceptionHandler {
    * Handles OfferNotAcceptedException and returns a 409 Conflict response.
    * Exception is thrown when a payment is created for an offer that was not
    * accepted.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(OfferNotAcceptedException.class)
   public ResponseEntity<String> handleOfferNotAcceptedException(OfferNotAcceptedException ex) {
@@ -159,9 +132,6 @@ public class GlobalExceptionHandler {
    * Handles PaymentAlreadyCompletedException and returns a 409 Conflict
    * response. Exception is thrown when an offer that was already paid is paid
    * again.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(PaymentAlreadyCompletedException.class)
   public ResponseEntity<String> handlePaymentAlreadyCompletedException(PaymentAlreadyCompletedException ex) {
@@ -174,9 +144,6 @@ public class GlobalExceptionHandler {
    * Handles ArticleNotAvailableException and returns a 409 Conflict response.
    * Exception is thrown when an article that was already bought receives a new
    * offer or is modified or deleted.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(ArticleNotAvailableException.class)
   public ResponseEntity<String> handleArticleNotAvailableException(ArticleNotAvailableException ex) {
@@ -189,9 +156,6 @@ public class GlobalExceptionHandler {
    * Handles AccessDeniedException and returns a 403 Forbidden response.
    * Exception is thrown when the authenticated user tries to act on a resource
    * owned by another user.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
@@ -205,9 +169,6 @@ public class GlobalExceptionHandler {
    * response.
    * Exception is thrown when the request body is malformed or a request DTO
    * fails its validation while being deserialized.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<String> handleMessageNotReadaEntityException(HttpMessageNotReadableException ex) {
@@ -217,12 +178,22 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handles InvalidStripeSignatureException and returns a 400 Bad Request
+   * response. Exception is thrown when a webhook request doesn't come from
+   * Stripe or was modified on the way.
+   */
+  @ExceptionHandler(InvalidStripeSignatureException.class)
+  public ResponseEntity<String> handleInvalidStripeSignatureException(InvalidStripeSignatureException ex) {
+    log.warn(ex.getMessage());
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(ex.getMessage());
+  }
+
+  /**
    * Handles IllegalArgumentException and returns a 400 Bad Request response.
    * Exception is thrown when a request is not valid for the current state, e.g.
    * changing the article or the seller of an offer.
-   *
-   * @param ex
-   * @return
    */
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
@@ -233,7 +204,6 @@ public class GlobalExceptionHandler {
 
   /**
    * NOT FOUND EXCEPTIONS
-   * 
    */
 
   @ExceptionHandler(ArticleNotFoundException.class)
@@ -267,9 +237,6 @@ public class GlobalExceptionHandler {
   /**
    * Handles BuyerNotFoundException and returns a 404 Not Found response.
    * Exception is thrown when a buyer is not found by their id.
-   * 
-   * @param ex
-   * @return
    */
   @ExceptionHandler(BuyerNotFoundException.class)
   public ResponseEntity<String> handleBuyerNotFoundException(BuyerNotFoundException ex) {

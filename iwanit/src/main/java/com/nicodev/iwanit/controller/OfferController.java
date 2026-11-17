@@ -39,9 +39,6 @@ public class OfferController {
 
   /**
    * Get all offers for a specific seller.
-   * 
-   * @param sellerId
-   * @return
    */
   @GetMapping("/seller/{sellerId}")
   public ResponseEntity<List<OfferResponseDto>> getAllSellerOffers(@PathVariable Long sellerId) {
@@ -66,9 +63,6 @@ public class OfferController {
 
   /**
    * Endpoint to get all offers for a specific article.
-   * 
-   * @param articleId
-   * @return
    */
   @GetMapping("/article/{articleId}")
   public ResponseEntity<List<OfferResponseDto>> getOffersByArticleId(@PathVariable Long articleId) {
